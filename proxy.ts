@@ -8,9 +8,21 @@ export async function proxy(request: NextRequest) {
     request: { headers: request.headers },
   });
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const pathname = request.nextUrl.pathname;
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (pathname.startsWith("/portal")) {
+      return NextResponse.redirect(new URL("/auth/login", request.url));
+    }
+
+    return response;
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -30,13 +42,8 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Allow OAuth callback through
-  if (request.nextUrl.pathname === "/auth/callback") {
-    return response;
-  }
-
   // Protect /portal — must be logged in AND be the allowed user
-  if (request.nextUrl.pathname.startsWith("/portal")) {
+  if (pathname.startsWith("/portal")) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
@@ -50,8 +57,7 @@ export async function proxy(request: NextRequest) {
 
   // Redirect to portal if already logged in as the allowed user
   if (
-    (request.nextUrl.pathname === "/auth/login" ||
-      request.nextUrl.pathname === "/auth/signup") &&
+    (pathname === "/auth/login" || pathname === "/auth/signup") &&
     user?.email === ALLOWED_EMAIL
   ) {
     return NextResponse.redirect(new URL("/portal", request.url));
@@ -61,5 +67,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|public).*)"],
+  matcher: ["/portal/:path*", "/auth/login", "/auth/signup"],
 };
