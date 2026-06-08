@@ -1,26 +1,62 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #071a35;
+  --foreground: #ffffff;
+  --primary: #1e90ff;
+  --accent: #00e5ff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html {
+  scroll-behavior: smooth;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+@keyframes float-delayed {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.animate-float { animation: float 7s ease-in-out infinite; }
+.animate-float-delayed { animation: float-delayed 9s ease-in-out infinite 2s; }
+.text-shimmer {
+  background: linear-gradient(90deg, #67e8f9 0%, #ffffff 40%, #67e8f9 60%, #a5f3fc 100%);
+  background-size: 200% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #071a35;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* Utility for very subtle white fills Tailwind v4 doesn't generate by default */
+.bg-white\/2 {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+.bg-white\/8 {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+.border-white\/8 {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+.border-white\/15 {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.bg-white\/15 {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.glow {
+  box-shadow: 0 0 25px rgba(0, 229, 255, 0.4);
 }

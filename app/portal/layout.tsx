@@ -1,0 +1,14 @@
+import PortalLayout from "@/components/PortalLayout";
+
+export const metadata = {
+  title: "Amoeba Labs Portal",
+  description: "Operating system for business execution and growth",
+};
+
+export default function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return <PortalLayout>{children}</PortalLayout>;
+}
