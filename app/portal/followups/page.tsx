@@ -191,7 +191,7 @@ export default function FollowupsPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
+          className="bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
         >
           + Log Follow-up
         </button>
@@ -202,12 +202,12 @@ export default function FollowupsPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Today", value: todayCount, color: "text-cyan-400", icon: "📅" },
+          { label: "Today", value: todayCount, color: "text-amber-300", icon: "📅" },
           { label: "Pending", value: pendingCount, color: "text-yellow-400", icon: "⏳" },
           { label: "Overdue", value: overdueCount, color: "text-red-400", icon: "🚨" },
           { label: "Done This Week", value: doneThisWeek, color: "text-green-400", icon: "✅" },
         ].map(s => (
-          <div key={s.label} className="bg-white/4 border border-white/8 rounded-xl p-4">
+          <div key={s.label} className="bg-black/20 border border-amber-300/10 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
               <span className="text-xl">{s.icon}</span>
               <span className="text-xs text-gray-500">{s.label}</span>
@@ -224,7 +224,7 @@ export default function FollowupsPage() {
           placeholder="Search by contact or notes..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 bg-white/4 border border-white/8 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+          className="flex-1 px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 text-sm"
         />
         <FormSelect
           value={filterType}
@@ -253,12 +253,12 @@ export default function FollowupsPage() {
             const isToday = f.follow_up_date === today;
             return (
               <div key={f.id} className={`bg-white/4 border rounded-xl p-4 transition ${
-                isToday ? "border-cyan-500/30" : "border-white/8 hover:border-white/12"
+                isToday ? "border-amber-300/30" : "border-white/8 hover:border-white/12"
               }`}>
                 <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                   {/* Type icon + Contact */}
                   <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-white/8 border border-white/10 flex items-center justify-center text-lg shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-white/8 border border-amber-300/10 flex items-center justify-center text-lg shrink-0">
                       {FOLLOWUP_TYPE_ICONS[f.type]}
                     </div>
                     <div className="min-w-0">
@@ -266,8 +266,8 @@ export default function FollowupsPage() {
                         <span className="text-white font-semibold text-sm">{f.contact_name}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full border ${
                           f.contact_type === "client"
-                            ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
-                            : "bg-purple-500/10 text-purple-400 border-purple-500/20"
+                            ? "bg-amber-300/10 text-amber-200 border-amber-300/20"
+                            : "bg-stone-300/10 text-stone-300 border-stone-300/20"
                         }`}>
                           {f.contact_type === "client" ? "Client" : "Lead"}
                         </span>
@@ -279,7 +279,7 @@ export default function FollowupsPage() {
 
                   {/* Dates */}
                   <div className="text-xs text-gray-500 shrink-0 sm:text-right">
-                    <p className={isToday ? "text-cyan-400 font-medium" : ""}>
+                    <p className={isToday ? "text-amber-300 font-medium" : ""}>
                       {isToday ? "Today" : new Date(f.follow_up_date).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}
                     </p>
                     {f.next_follow_up && (
@@ -384,7 +384,7 @@ export default function FollowupsPage() {
 
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={submitting}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
+              className="flex-1 bg-amber-300 hover:bg-amber-200 disabled:bg-amber-300/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
               {submitting ? "Saving..." : editingId ? "Update" : "Log Follow-up"}
             </button>
             <button type="button" onClick={() => setShowModal(false)}

@@ -19,7 +19,7 @@ export function FormInput({ label, error, className, ...props }: FormInputProps)
       )}
       <input
         {...props}
-        className={`w-full px-4 py-2.5 bg-white/4 border border-white/8 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/6 transition-all text-sm ${className ?? ""}`}
+        className={`w-full px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-white/6 transition-all text-sm ${className ?? ""}`}
       />
       {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
     </div>
@@ -72,7 +72,7 @@ export function FormSelect({ label, error, value, onChange, options, required, p
       <button
         type="button"
         onClick={() => setOpen(prev => !prev)}
-        className="w-full px-4 py-2.5 bg-white/4 border border-white/8 rounded-xl text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:border-cyan-500/50 transition-all"
+        className="w-full px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:border-amber-300/50 transition-all"
       >
         <span className={selected ? "text-white" : "text-gray-600"}>
           {selected?.label ?? placeholder ?? "Select…"}
@@ -104,7 +104,7 @@ export function FormSelect({ label, error, value, onChange, options, required, p
               onClick={() => pick(opt.value)}
               className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
                 opt.value === (value ?? "")
-                  ? "bg-cyan-500/20 text-cyan-300 font-medium"
+                  ? "bg-amber-300/20 text-amber-200 font-medium"
                   : "text-gray-300 hover:bg-white/8"
               }`}
             >
@@ -136,7 +136,7 @@ export function FormTextarea({ label, error, className, ...props }: FormTextarea
       )}
       <textarea
         {...props}
-        className={`w-full px-4 py-2.5 bg-white/4 border border-white/8 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 focus:bg-white/6 transition-all text-sm resize-none ${className ?? ""}`}
+        className={`w-full px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-white/6 transition-all text-sm resize-none ${className ?? ""}`}
       />
       {error && <p className="text-red-400 text-xs mt-1">{error}</p>}
     </div>

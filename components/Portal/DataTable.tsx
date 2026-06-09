@@ -21,16 +21,16 @@ export default function DataTable<T extends { id: string }>({
 }: DataTableProps<T>) {
   if (data.length === 0) {
     return (
-      <div className="border border-white/10 rounded-lg p-8 text-center">
+      <div className="border border-amber-300/10 rounded-lg p-8 text-center">
         <p className="text-gray-400">No data available</p>
       </div>
     );
   }
 
   return (
-    <div className="border border-white/10 rounded-lg overflow-hidden">
+    <div className="border border-amber-300/10 rounded-lg overflow-hidden">
       <table className="w-full">
-        <thead className="bg-white/5 border-b border-white/10">
+        <thead className="bg-amber-300/5 border-b border-amber-300/10">
           <tr>
             {columns.map((col) => (
               <th
@@ -47,7 +47,7 @@ export default function DataTable<T extends { id: string }>({
           {data.map((item, idx) => (
             <tr
               key={item.id}
-              className={`border-t border-white/5 hover:bg-white/5 transition ${
+              className={`border-t border-white/5 hover:bg-amber-300/5 transition ${
                 onRowClick ? "cursor-pointer" : ""
               }`}
               onClick={() => onRowClick?.(item)}

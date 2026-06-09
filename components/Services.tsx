@@ -9,8 +9,8 @@ const services = [
     title: "Business Strategy",
     description:
       "Clear plans for growth, positioning, operations, technology, and revenue. We turn vague goals into executable roadmaps.",
-    accent: "from-cyan-500/20 to-cyan-500/5",
-    border: "from-cyan-500/30 via-transparent to-transparent",
+    accent: "from-amber-300/20 to-amber-300/5",
+    border: "from-amber-300/30 via-transparent to-transparent",
   },
   {
     number: "02",
@@ -18,8 +18,8 @@ const services = [
     title: "Execution Systems",
     description:
       "Operating systems, workflows, KPIs, team processes, and management tools that help the business actually move.",
-    accent: "from-blue-500/20 to-blue-500/5",
-    border: "from-blue-500/30 via-transparent to-transparent",
+    accent: "from-yellow-700/20 to-yellow-700/5",
+    border: "from-yellow-700/30 via-transparent to-transparent",
   },
   {
     number: "03",
@@ -27,8 +27,8 @@ const services = [
     title: "AI & Automation",
     description:
       "Practical AI workflows, assistants, dashboards, and automations that reduce manual work and improve decisions.",
-    accent: "from-purple-500/20 to-purple-500/5",
-    border: "from-purple-500/30 via-transparent to-transparent",
+    accent: "from-stone-300/12 to-stone-500/5",
+    border: "from-stone-300/20 via-transparent to-transparent",
   },
   {
     number: "04",
@@ -36,8 +36,8 @@ const services = [
     title: "Product & Software",
     description:
       "Websites, SaaS platforms, CRMs, portals, ERP modules, internal tools, and custom software built around your business.",
-    accent: "from-amber-500/20 to-amber-500/5",
-    border: "from-amber-500/30 via-transparent to-transparent",
+    accent: "from-yellow-900/25 to-yellow-900/5",
+    border: "from-yellow-800/35 via-transparent to-transparent",
   },
   {
     number: "05",
@@ -45,8 +45,8 @@ const services = [
     title: "Sales & Growth",
     description:
       "Lead systems, funnels, go-to-market planning, customer journeys, reporting, and growth operations.",
-    accent: "from-emerald-500/20 to-emerald-500/5",
-    border: "from-emerald-500/30 via-transparent to-transparent",
+    accent: "from-lime-900/20 to-lime-900/5",
+    border: "from-lime-800/25 via-transparent to-transparent",
   },
   {
     number: "06",
@@ -54,8 +54,8 @@ const services = [
     title: "End-to-End Buildout",
     description:
       "From idea to launch and beyond. We can plan, design, build, deploy, measure, and iterate with your team.",
-    accent: "from-rose-500/20 to-rose-500/5",
-    border: "from-rose-500/30 via-transparent to-transparent",
+    accent: "from-orange-950/30 to-orange-950/5",
+    border: "from-orange-900/30 via-transparent to-transparent",
   },
 ];
 
@@ -70,12 +70,12 @@ export default function Services() {
           transition={{ duration: 0.7 }}
           className="max-w-2xl mb-20"
         >
-          <p className="text-cyan-400 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
+          <p className="text-amber-300 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
             What We Do
           </p>
           <h2 className="text-4xl md:text-5xl font-bold mb-5 leading-tight">
             Complete{" "}
-            <span className="bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-amber-200 to-yellow-600 bg-clip-text text-transparent">
               Business Solutions
             </span>
           </h2>
@@ -96,12 +96,12 @@ export default function Services() {
               transition={{ duration: 0.55, delay: i * 0.07 }}
             >
               <div className={`p-px rounded-2xl bg-linear-to-br ${service.border} h-full`}>
-                <div className="group rounded-2xl bg-[#071a35] hover:bg-[#081e3a] transition-all duration-300 p-7 h-full flex flex-col relative overflow-hidden">
+                <div className="group rounded-2xl brand-panel hover:bg-[#15120c] transition-all duration-300 p-7 h-full flex flex-col relative overflow-hidden">
                   <div className={`absolute inset-0 bg-linear-to-br ${service.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
 
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="flex items-start justify-between mb-5">
-                      <span className="text-cyan-300 font-mono text-xl font-bold">
+                      <span className="text-amber-200 font-mono text-xl font-bold">
                         {service.icon}
                       </span>
                       <span className="text-gray-700 font-mono text-sm font-bold">
@@ -114,7 +114,7 @@ export default function Services() {
                       {service.description}
                     </p>
 
-                    <div className="mt-5 flex items-center gap-1.5 text-xs text-gray-600 group-hover:text-cyan-400 transition-colors duration-300">
+                    <div className="mt-5 flex items-center gap-1.5 text-xs text-gray-600 group-hover:text-amber-300 transition-colors duration-300">
                       <span>Learn more</span>
                       <svg className="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />

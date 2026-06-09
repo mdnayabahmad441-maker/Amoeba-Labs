@@ -14,7 +14,7 @@ export default function Stats() {
     <section className="py-16 px-6">
       <div className="max-w-7xl mx-auto">
         {/* Top separator */}
-        <div className="h-px bg-linear-to-r from-transparent via-white/10 to-transparent mb-16" />
+        <div className="h-px gold-rule mb-16" />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat, i) => (
@@ -26,9 +26,9 @@ export default function Stats() {
               transition={{ duration: 0.5, delay: i * 0.09 }}
             >
               {/* Gradient border wrapper */}
-              <div className="p-px rounded-2xl bg-linear-to-br from-white/10 via-transparent to-cyan-500/10 h-full">
-                <div className="rounded-2xl bg-[#071a35] hover:bg-[#081e3a] transition-colors duration-300 p-6 md:p-8 h-full flex flex-col justify-between">
-                  <div className="text-4xl md:text-5xl font-bold bg-linear-to-br from-cyan-300 to-blue-400 bg-clip-text text-transparent mb-3">
+              <div className="p-px rounded-2xl bg-linear-to-br from-amber-300/20 via-white/5 to-transparent h-full">
+                <div className="rounded-2xl brand-panel hover:bg-[#15120c] transition-colors duration-300 p-6 md:p-8 h-full flex flex-col justify-between">
+                  <div className="text-4xl md:text-5xl font-bold bg-linear-to-br from-amber-100 to-yellow-700 bg-clip-text text-transparent mb-3">
                     {stat.value}
                   </div>
                   <div>
@@ -44,7 +44,7 @@ export default function Stats() {
         </div>
 
         {/* Bottom separator */}
-        <div className="h-px bg-linear-to-r from-transparent via-white/10 to-transparent mt-16" />
+        <div className="h-px gold-rule mt-16" />
       </div>
     </section>
   );

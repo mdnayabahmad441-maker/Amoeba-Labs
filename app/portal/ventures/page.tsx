@@ -122,7 +122,7 @@ export default function VenturesPage() {
       case "Inactive":
         return "bg-gray-500/20 text-gray-300";
       case "Planning":
-        return "bg-blue-500/20 text-blue-300";
+        return "bg-amber-300/15 text-amber-200";
       default:
         return "bg-gray-500/20 text-gray-300";
     }
@@ -142,7 +142,7 @@ export default function VenturesPage() {
         </div>
         <button
           onClick={handleAddVenture}
-          className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-3 rounded-lg transition"
+          className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition"
         >
           + Add Venture
         </button>
@@ -214,7 +214,7 @@ export default function VenturesPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => handleEditVenture(venture)}
-                className="text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded hover:bg-cyan-500/30 transition"
+                className="text-xs px-2 py-1 bg-amber-300/20 text-amber-200 rounded hover:bg-amber-300/30 transition"
               >
                 Edit
               </button>
@@ -277,7 +277,7 @@ export default function VenturesPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-500/50 text-black font-semibold py-2 rounded-lg transition"
+              className="flex-1 bg-amber-300 hover:bg-amber-400 disabled:bg-amber-300/50 text-black font-semibold py-2 rounded-lg transition"
             >
               {submitting ? "Saving..." : "Save Venture"}
             </button>

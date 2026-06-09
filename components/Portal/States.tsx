@@ -5,7 +5,7 @@ export function LoadingState() {
     <div className="flex items-center justify-center py-12">
       <div className="text-center">
         <div className="inline-block">
-          <div className="w-8 h-8 border-4 border-cyan-500/30 border-t-cyan-500 rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-4 border-amber-300/30 border-t-amber-300 rounded-full animate-spin"></div>
         </div>
         <p className="text-gray-400 mt-4">Loading...</p>
       </div>

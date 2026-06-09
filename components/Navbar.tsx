@@ -25,7 +25,7 @@ export default function Navbar() {
     <header
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[#071A35]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20"
+          ? "bg-[#050505]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20"
           : "bg-transparent"
       }`}
     >
@@ -68,7 +68,7 @@ export default function Navbar() {
           </Link>
           <a
             href="#contact"
-            className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-5 py-2.5 rounded-full text-sm transition-all duration-300"
+            className="bg-amber-300 hover:bg-amber-200 text-black font-semibold px-5 py-2.5 rounded-full text-sm transition-all duration-300"
           >
             Build With Us
           </a>
@@ -102,7 +102,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       {menuOpen && (
-        <div className="md:hidden bg-[#071A35]/98 backdrop-blur-md border-t border-white/10 px-6 py-6 space-y-4">
+        <div className="md:hidden bg-[#050505]/98 backdrop-blur-md border-t border-white/10 px-6 py-6 space-y-4">
           {navLinks.map((link) => (
             <a
               key={link.label}
@@ -120,7 +120,7 @@ export default function Navbar() {
             <a
               href="#contact"
               onClick={() => setMenuOpen(false)}
-              className="bg-cyan-500 hover:bg-cyan-400 text-black font-semibold px-5 py-3 rounded-full text-sm text-center transition"
+              className="bg-amber-300 hover:bg-amber-200 text-black font-semibold px-5 py-3 rounded-full text-sm text-center transition"
             >
               Build With Us
             </a>

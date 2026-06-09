@@ -10,10 +10,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="relative border-t border-white/8 py-12 px-6 overflow-hidden">
-      {/* Subtle glow */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-96 h-24 bg-cyan-500/4 rounded-full blur-3xl" />
-
+    <footer className="relative border-t border-amber-300/10 py-12 px-6 overflow-hidden">
       <div className="relative max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           {/* Brand */}
@@ -28,12 +25,12 @@ export default function Footer() {
             <div>
               <h3 className="text-xl font-bold tracking-tight">
                 NAYAB{" "}
-                <span className="bg-linear-to-r from-amber-200 to-yellow-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-amber-100 to-yellow-700 bg-clip-text text-transparent">
                   LABS
                 </span>
               </h3>
               <p className="text-gray-600 text-sm mt-1">
-                Building AI ventures for the next decade.
+                Strategy, systems, AI, and execution.
               </p>
             </div>
           </div>
@@ -44,7 +41,7 @@ export default function Footer() {
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-gray-600 hover:text-gray-300 transition-colors"
+                className="text-sm text-gray-600 hover:text-amber-100 transition-colors"
               >
                 {link.label}
               </a>

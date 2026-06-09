@@ -11,7 +11,7 @@ type InvoiceWithClient = Invoice & { client_name: string };
 
 const STATUS_COLORS: Record<string, string> = {
   Paid: "bg-green-500/15 text-green-400 border-green-500/20",
-  Sent: "bg-blue-500/15 text-blue-400 border-blue-500/20",
+  Sent: "bg-amber-300/15 text-amber-200 border-amber-300/20",
   Draft: "bg-gray-500/15 text-gray-400 border-gray-500/20",
   Overdue: "bg-red-500/15 text-red-400 border-red-500/20",
   Cancelled: "bg-red-500/15 text-red-400 border-red-500/20",
@@ -192,10 +192,10 @@ export default function BillingPage() {
     body { font-family: 'Segoe UI', Arial, sans-serif; color: #111; background: #fff; }
     .page { max-width: 720px; margin: 40px auto; padding: 48px; border: 1px solid #e5e7eb; border-radius: 12px; }
     .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 48px; }
-    .brand h1 { font-size: 22px; font-weight: 800; color: #071a35; letter-spacing: -0.5px; }
+    .brand h1 { font-size: 22px; font-weight: 800; color: #0b0a08; letter-spacing: -0.5px; }
     .brand p { font-size: 12px; color: #6b7280; margin-top: 4px; }
     .invoice-meta { text-align: right; }
-    .invoice-meta .inv-num { font-size: 28px; font-weight: 800; color: #071a35; }
+    .invoice-meta .inv-num { font-size: 28px; font-weight: 800; color: #0b0a08; }
     .invoice-meta .inv-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 1px; }
     .status-badge { display: inline-block; margin-top: 8px; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
       background: ${inv.status === "Paid" ? "#dcfce7" : inv.status === "Overdue" ? "#fee2e2" : "#fef9c3"};
@@ -213,7 +213,7 @@ export default function BillingPage() {
     .totals { display: flex; justify-content: flex-end; }
     .totals-box { width: 260px; }
     .total-row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; color: #374151; }
-    .total-row.grand { border-top: 2px solid #071a35; padding-top: 12px; margin-top: 6px; font-size: 16px; font-weight: 800; color: #071a35; }
+    .total-row.grand { border-top: 2px solid #0b0a08; padding-top: 12px; margin-top: 6px; font-size: 16px; font-weight: 800; color: #0b0a08; }
     .notes-section { margin-top: 40px; padding: 16px; background: #f9fafb; border-radius: 8px; }
     .notes-section label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #9ca3af; display: block; margin-bottom: 6px; }
     .notes-section p { font-size: 13px; color: #374151; }
@@ -287,7 +287,7 @@ export default function BillingPage() {
     </div>
 
     <div class="no-print" style="text-align:center;margin-top:32px;">
-      <button onclick="window.print()" style="padding:10px 28px;background:#071a35;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
+      <button onclick="window.print()" style="padding:10px 28px;background:#0b0a08;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;">
         🖨️ Print / Save as PDF
       </button>
     </div>
@@ -327,7 +327,7 @@ export default function BillingPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-cyan-500 hover:bg-cyan-400 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
+          className="bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
         >
           + Create Invoice
         </button>
@@ -365,7 +365,7 @@ export default function BillingPage() {
           placeholder="Search by client or invoice number..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="flex-1 px-4 py-2.5 bg-white/4 border border-white/8 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-cyan-500/50 text-sm"
+          className="flex-1 px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 text-sm"
         />
         <FormSelect
           value={filterStatus}
@@ -383,7 +383,7 @@ export default function BillingPage() {
           {filtered.map(inv => (
             <div
               key={inv.id}
-              className="bg-white/4 border border-white/8 hover:border-white/12 rounded-xl p-4 transition"
+              className="bg-black/20 border border-amber-300/10 hover:border-white/12 rounded-xl p-4 transition"
             >
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 {/* Invoice info */}
@@ -423,7 +423,7 @@ export default function BillingPage() {
                   )}
                   <button
                     onClick={() => printInvoice(inv)}
-                    className="text-xs px-3 py-1.5 bg-purple-500/15 text-purple-300 border border-purple-500/25 rounded-lg hover:bg-purple-500/25 transition font-medium flex items-center gap-1"
+                    className="text-xs px-3 py-1.5 bg-stone-300/10 text-stone-300 border border-stone-300/20 rounded-lg hover:bg-stone-300/15 transition font-medium flex items-center gap-1"
                     title="Download / Print Invoice"
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -434,7 +434,7 @@ export default function BillingPage() {
                   {inv.status === "Draft" && (
                     <button
                       onClick={() => updateStatus(inv.id, "Sent")}
-                      className="text-xs px-3 py-1.5 bg-blue-500/15 text-blue-400 border border-blue-500/25 rounded-lg hover:bg-blue-500/25 transition font-medium"
+                      className="text-xs px-3 py-1.5 bg-amber-300/15 text-amber-200 border border-amber-300/25 rounded-lg hover:bg-amber-300/20 transition font-medium"
                     >
                       Send
                     </button>
@@ -521,7 +521,7 @@ export default function BillingPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/40 text-black font-bold py-2.5 rounded-xl transition text-sm"
+              className="flex-1 bg-amber-300 hover:bg-amber-200 disabled:bg-amber-300/40 text-black font-bold py-2.5 rounded-xl transition text-sm"
             >
               {submitting ? "Saving..." : editingId ? "Update Invoice" : "Create Invoice"}
             </button>

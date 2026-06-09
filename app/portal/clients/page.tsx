@@ -172,7 +172,7 @@ export default function ClientsPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-3 rounded-lg transition"
+          className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition"
         >
           + Add Client
         </button>
@@ -191,7 +191,7 @@ export default function ClientsPage() {
           placeholder="Search clients..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="px-4 py-2 bg-amber-300/5 border border-amber-300/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
         />
         <FormSelect
           value={filterType}
@@ -266,7 +266,7 @@ export default function ClientsPage() {
                     value === "Active"
                       ? "bg-green-500/20 text-green-300"
                       : value === "Lead"
-                      ? "bg-blue-500/20 text-blue-300"
+                      ? "bg-amber-300/15 text-amber-200"
                       : value === "Inactive"
                       ? "bg-gray-500/20 text-gray-300"
                       : "bg-red-500/20 text-red-300"
@@ -287,7 +287,7 @@ export default function ClientsPage() {
               </button>
               <button
                 onClick={() => openEditModal(client)}
-                className="text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded hover:bg-cyan-500/30 transition"
+                className="text-xs px-2 py-1 bg-amber-300/20 text-amber-200 rounded hover:bg-amber-300/30 transition"
               >
                 Edit
               </button>
@@ -397,7 +397,7 @@ export default function ClientsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-500/50 text-black font-semibold py-2 rounded-lg transition"
+              className="flex-1 bg-amber-300 hover:bg-amber-400 disabled:bg-amber-300/50 text-black font-semibold py-2 rounded-lg transition"
             >
               {submitting ? "Saving..." : editingId ? "Update Client" : "Add Client"}
             </button>

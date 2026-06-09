@@ -37,7 +37,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#071A35] flex items-center justify-center">
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
         <div className="text-white">Loading...</div>
       </div>
     );
@@ -61,15 +61,15 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#071A35] text-white flex">
+    <div className="min-h-screen bg-[#050505] text-white flex">
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-[#0a2340] border-r border-white/10 transition-all duration-300 z-40 ${
+        className={`fixed left-0 top-0 h-full bg-[#0b0a08] border-r border-amber-300/10 transition-all duration-300 z-40 ${
           sidebarOpen ? "w-64" : "w-20"
         }`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+        <div className="p-6 border-b border-amber-300/10 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Image
               src="/nayab-labs-logo.jpeg"
@@ -83,7 +83,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
           </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1 hover:bg-white/10 rounded-lg transition"
+            className="p-1 hover:bg-amber-300/10 rounded-lg transition"
           >
             {sidebarOpen ? "←" : "→"}
           </button>
@@ -97,8 +97,8 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
               href={item.href}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                 isActive(item.href)
-                  ? "bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"
-                  : "text-gray-400 hover:bg-white/5"
+                  ? "bg-amber-300/20 text-amber-300 border border-amber-300/50"
+                  : "text-gray-400 hover:bg-amber-300/5"
               }`}
               title={item.label}
             >
@@ -123,7 +123,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       {/* Main Content */}
       <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         {/* Top Bar */}
-        <header className="bg-[#0a2340] border-b border-white/10 px-8 py-4 flex items-center justify-between">
+        <header className="bg-[#0b0a08] border-b border-amber-300/10 px-8 py-4 flex items-center justify-between">
           <h2 className="text-sm text-gray-400">
             Welcome, <span className="text-white font-semibold">{user?.email?.split("@")[0]}</span>
           </h2>

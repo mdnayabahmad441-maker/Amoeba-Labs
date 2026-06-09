@@ -12,21 +12,20 @@ export default function FounderProgram() {
           viewport={{ once: true }}
           transition={{ duration: 0.7 }}
         >
-          <div className="p-px rounded-3xl bg-linear-to-br from-cyan-500/30 via-blue-500/15 to-purple-500/10">
-            <div className="rounded-3xl relative overflow-hidden bg-[#071a35]">
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_-20%,rgba(0,229,255,0.1),transparent)]" />
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-linear-to-b from-cyan-500/40 to-transparent" />
-              <div className="absolute inset-0 bg-linear-to-br from-cyan-500/4 via-transparent to-blue-600/4" />
+          <div className="p-px rounded-3xl bg-linear-to-br from-amber-300/30 via-yellow-700/15 to-white/5">
+            <div className="rounded-3xl relative overflow-hidden brand-panel">
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(244,213,138,0.08),transparent_45%,rgba(255,255,255,0.03))]" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-32 bg-linear-to-b from-amber-300/40 to-transparent" />
 
               <div className="relative z-10 px-8 md:px-16 py-16 md:py-20">
                 <div className="grid md:grid-cols-2 gap-12 items-center">
                   <div>
-                    <p className="text-cyan-400 uppercase tracking-[0.3em] text-xs font-semibold mb-5">
+                    <p className="text-amber-300 uppercase tracking-[0.3em] text-xs font-semibold mb-5">
                       Build With Us
                     </p>
                     <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
                       Need Strategy And{" "}
-                      <span className="bg-linear-to-r from-cyan-400 via-blue-300 to-purple-400 bg-clip-text text-transparent">
+                      <span className="bg-linear-to-r from-amber-100 via-yellow-600 to-stone-200 bg-clip-text text-transparent">
                         Execution?
                       </span>
                     </h2>
@@ -39,7 +38,7 @@ export default function FounderProgram() {
                     <div className="flex flex-col sm:flex-row gap-4">
                       <a
                         href="/apply"
-                        className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-cyan-500 hover:bg-cyan-400 text-black font-bold rounded-full transition-all duration-300 shadow-lg shadow-cyan-500/20 hover:shadow-cyan-400/30 hover:scale-[1.02] text-sm"
+                        className="group inline-flex items-center justify-center gap-2 px-7 py-3.5 bg-amber-300 hover:bg-amber-200 text-black font-bold rounded-full transition-all duration-300 shadow-lg shadow-amber-900/20 hover:shadow-amber-300/30 hover:scale-[1.02] text-sm"
                       >
                         Start A Project
                         <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -48,7 +47,7 @@ export default function FounderProgram() {
                       </a>
                       <a
                         href="#contact"
-                        className="inline-flex items-center justify-center gap-2 px-7 py-3.5 border border-white/15 hover:border-white/30 rounded-full text-white font-medium transition-all duration-300 hover:bg-white/4 text-sm"
+                        className="inline-flex items-center justify-center gap-2 px-7 py-3.5 border border-amber-300/20 hover:border-amber-200/45 rounded-full text-white font-medium transition-all duration-300 hover:bg-amber-300/5 text-sm"
                       >
                         Talk To Us First
                       </a>
@@ -64,9 +63,9 @@ export default function FounderProgram() {
                     ].map((item) => (
                       <div
                         key={item.title}
-                        className="flex items-start gap-4 p-4 rounded-xl bg-white/4 border border-white/8 hover:border-white/15 transition-colors"
+                        className="flex items-start gap-4 p-4 rounded-xl bg-black/20 border border-amber-300/10 hover:border-amber-300/25 transition-colors"
                       >
-                        <span className="text-cyan-300 font-mono text-sm font-bold shrink-0">{item.icon}</span>
+                        <span className="text-amber-200 font-mono text-sm font-bold shrink-0">{item.icon}</span>
                         <div>
                           <div className="text-white font-semibold text-sm mb-0.5">{item.title}</div>
                           <div className="text-gray-500 text-xs leading-relaxed">{item.desc}</div>

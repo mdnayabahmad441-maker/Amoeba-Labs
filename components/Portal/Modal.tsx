@@ -33,7 +33,7 @@ export default function Modal({ isOpen, onClose, title, children }: ModalProps) 
       {/* Centering wrapper — offsets for the fixed sidebar on desktop */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         <div
-          className="bg-[#0a1f3a] border border-white/10 rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl shadow-black/60 pointer-events-auto"
+          className="bg-[#0a1f3a] border border-amber-300/10 rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-2xl shadow-black/60 pointer-events-auto"
           onClick={e => e.stopPropagation()}
         >
           {/* Header — fixed, never scrolls */}

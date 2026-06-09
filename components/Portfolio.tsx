@@ -14,12 +14,12 @@ export default function Portfolio() {
           transition={{ duration: 0.7 }}
           className="text-center mb-16"
         >
-          <p className="text-cyan-400 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
+          <p className="text-amber-300 uppercase tracking-[0.3em] text-xs font-semibold mb-4">
             Portfolio
           </p>
           <h2 className="text-4xl md:text-5xl font-bold mb-5">
             Our{" "}
-            <span className="bg-linear-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-linear-to-r from-amber-200 to-yellow-600 bg-clip-text text-transparent">
               Ventures
             </span>
           </h2>
@@ -36,11 +36,10 @@ export default function Portfolio() {
           transition={{ duration: 0.7 }}
           className="mb-5"
         >
-          <div className="p-px rounded-3xl bg-linear-to-br from-cyan-500/30 via-blue-500/10 to-transparent">
-            <div className="rounded-3xl bg-[#071a35] p-8 md:p-12 relative overflow-hidden">
-              {/* Background decoration */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
+          <div className="p-px rounded-3xl bg-linear-to-br from-amber-300/30 via-yellow-700/10 to-transparent">
+            <div className="rounded-3xl brand-panel p-8 md:p-12 relative overflow-hidden">
+              <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-300/45 to-transparent" />
+              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(244,213,138,0.07),transparent_42%,rgba(255,255,255,0.03))]" />
 
               <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
                 {/* Left */}
@@ -49,7 +48,7 @@ export default function Portfolio() {
                     <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">
                       School ERP · AI · SaaS
                     </span>
-                    <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-cyan-500/15 text-cyan-400 border-cyan-500/30">
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold border bg-amber-300/15 text-amber-300 border-amber-300/30">
                       ● Building
                     </span>
                   </div>
@@ -63,9 +62,9 @@ export default function Portfolio() {
                     educational institutions. Manages admissions, students, staff,
                     timetables, fees, billing, and reporting — plus an AI engine
                     that generates exam-ready questions aligned to{" "}
-                    <span className="text-cyan-400 font-medium">NEET</span>,{" "}
-                    <span className="text-cyan-400 font-medium">CBSE</span>, and{" "}
-                    <span className="text-cyan-400 font-medium">JEE</span> syllabi.
+                    <span className="text-amber-300 font-medium">NEET</span>,{" "}
+                    <span className="text-amber-300 font-medium">CBSE</span>, and{" "}
+                    <span className="text-amber-300 font-medium">JEE</span> syllabi.
                   </p>
 
                   <div className="flex flex-wrap gap-2">
@@ -73,7 +72,7 @@ export default function Portfolio() {
                       (tag) => (
                         <span
                           key={tag}
-                          className="px-3 py-1.5 rounded-full border border-white/10 bg-white/4 text-gray-400 text-xs"
+                          className="px-3 py-1.5 rounded-full border border-amber-300/10 bg-black/20 text-stone-400 text-xs"
                         >
                           {tag}
                         </span>
@@ -92,7 +91,7 @@ export default function Portfolio() {
                   ].map((m) => (
                     <div
                       key={m.label}
-                      className="bg-white/4 border border-white/8 rounded-2xl p-4"
+                      className="bg-black/20 border border-amber-300/10 rounded-2xl p-4"
                     >
                       <span className="text-2xl block mb-2">{m.icon}</span>
                       <div className="text-white font-bold text-lg">{m.value}</div>
@@ -127,10 +126,10 @@ export default function Portfolio() {
               transition={{ duration: 0.6, delay: i * 0.1 }}
             >
               <div className="p-px rounded-2xl bg-linear-to-br from-white/8 to-transparent h-full">
-                <div className="rounded-2xl bg-[#071a35] p-7 h-full flex flex-col">
+                <div className="rounded-2xl brand-panel p-7 h-full flex flex-col">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-xs text-gray-600 uppercase tracking-wider">TBD</span>
-                    <span className="px-3 py-1 rounded-full text-xs border bg-white/4 text-gray-500 border-white/10">
+                    <span className="px-3 py-1 rounded-full text-xs border bg-amber-300/5 text-gray-500 border-amber-300/10">
                       Coming Soon
                     </span>
                   </div>
@@ -138,7 +137,7 @@ export default function Portfolio() {
                   <p className="text-gray-500 text-sm leading-relaxed mb-5 flex-1">{v.desc}</p>
                   <div className="flex gap-2">
                     {v.tags.map((tag) => (
-                      <span key={tag} className="px-3 py-1 rounded-full bg-white/4 border border-white/8 text-gray-500 text-xs">
+                      <span key={tag} className="px-3 py-1 rounded-full bg-black/20 border border-amber-300/10 text-gray-500 text-xs">
                         {tag}
                       </span>
                     ))}

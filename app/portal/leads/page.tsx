@@ -141,8 +141,8 @@ export default function LeadsPage() {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case "New Lead": return "bg-blue-500/20 text-blue-300";
-      case "Contacted": return "bg-purple-500/20 text-purple-300";
+      case "New Lead": return "bg-amber-300/15 text-amber-200";
+      case "Contacted": return "bg-stone-300/10 text-stone-300";
       case "Demo Scheduled": return "bg-yellow-500/20 text-yellow-300";
       case "Proposal Sent": return "bg-orange-500/20 text-orange-300";
       case "Negotiation": return "bg-amber-500/20 text-amber-300";
@@ -164,7 +164,7 @@ export default function LeadsPage() {
         </div>
         <button
           onClick={openAddModal}
-          className="bg-cyan-500 hover:bg-cyan-600 text-black font-semibold px-6 py-3 rounded-lg transition"
+          className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition"
         >
           + Add Lead
         </button>
@@ -183,7 +183,7 @@ export default function LeadsPage() {
           placeholder="Search leads..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          className="px-4 py-2 bg-amber-300/5 border border-amber-300/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-300"
         />
         <FormSelect
           value={filterStage}
@@ -240,7 +240,7 @@ export default function LeadsPage() {
               </button>
               <button
                 onClick={() => openEditModal(lead)}
-                className="text-xs px-2 py-1 bg-cyan-500/20 text-cyan-300 rounded hover:bg-cyan-500/30 transition"
+                className="text-xs px-2 py-1 bg-amber-300/20 text-amber-200 rounded hover:bg-amber-300/30 transition"
               >
                 Edit
               </button>
@@ -331,7 +331,7 @@ export default function LeadsPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="flex-1 bg-cyan-500 hover:bg-cyan-600 disabled:bg-cyan-500/50 text-black font-semibold py-2 rounded-lg transition"
+              className="flex-1 bg-amber-300 hover:bg-amber-400 disabled:bg-amber-300/50 text-black font-semibold py-2 rounded-lg transition"
             >
               {submitting ? "Saving..." : editingId ? "Update Lead" : "Add Lead"}
             </button>

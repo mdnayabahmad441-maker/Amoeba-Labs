@@ -120,7 +120,7 @@ export default function FollowupModal({
 
         <div className="flex gap-3 pt-1">
           <button type="submit" disabled={submitting}
-            className="flex-1 bg-cyan-500 hover:bg-cyan-400 disabled:bg-cyan-500/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
+            className="flex-1 bg-amber-300 hover:bg-amber-200 disabled:bg-amber-300/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
             {submitting ? "Saving..." : "Log Follow-up"}
           </button>
           <button type="button" onClick={onClose}

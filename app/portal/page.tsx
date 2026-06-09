@@ -128,8 +128,8 @@ export default function DashboardPage() {
   if (!stats) return <ErrorState message="Failed to load dashboard" />;
 
   const stageColors: Record<string, string> = {
-    "New Lead": "bg-blue-500",
-    "Contacted": "bg-purple-500",
+    "New Lead": "bg-amber-300",
+    "Contacted": "bg-stone-400",
     "Demo Scheduled": "bg-yellow-500",
     "Proposal Sent": "bg-orange-500",
     "Negotiation": "bg-amber-500",
@@ -175,10 +175,10 @@ export default function DashboardPage() {
         {[
           { label: "Total Revenue", value: `₹${stats.totalRevenue.toLocaleString()}`, sub: "Paid invoices", icon: "💰", color: "text-green-400" },
           { label: "Pending Payments", value: `₹${stats.pendingAmount.toLocaleString()}`, sub: "Awaiting payment", icon: "⏳", color: "text-yellow-400" },
-          { label: "Total Clients", value: stats.totalClients, sub: `${stats.activeClients} active`, icon: "🏢", color: "text-cyan-400" },
-          { label: "Total Leads", value: stats.totalLeads, sub: "In pipeline", icon: "👥", color: "text-purple-400" },
+          { label: "Total Clients", value: stats.totalClients, sub: `${stats.activeClients} active`, icon: "🏢", color: "text-amber-300" },
+          { label: "Total Leads", value: stats.totalLeads, sub: "In pipeline", icon: "👥", color: "text-stone-300" },
         ].map(card => (
-          <div key={card.label} className="bg-white/4 border border-white/8 rounded-xl p-5">
+          <div key={card.label} className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-2xl">{card.icon}</span>
               <span className="text-xs text-gray-500">{card.sub}</span>
@@ -193,17 +193,17 @@ export default function DashboardPage() {
       <div className="grid lg:grid-cols-2 gap-6">
 
         {/* Recent Payments */}
-        <div className="bg-white/4 border border-white/8 rounded-xl p-5">
+        <div className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold">💳 Recent Payments</h2>
-            <Link href="/portal/billing" className="text-xs text-cyan-400 hover:text-cyan-300">View all →</Link>
+            <Link href="/portal/billing" className="text-xs text-amber-300 hover:text-amber-200">View all →</Link>
           </div>
           {recentPayments.length === 0 ? (
             <p className="text-gray-500 text-sm">No payments recorded yet</p>
           ) : (
             <div className="space-y-2.5">
               {recentPayments.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between p-3 bg-white/4 rounded-lg">
+                <div key={inv.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                   <div>
                     <p className="text-white text-sm font-medium">{inv.client_name}</p>
                     <p className="text-gray-500 text-xs">{inv.invoice_number} · {new Date(inv.created_at).toLocaleDateString()}</p>
@@ -219,17 +219,17 @@ export default function DashboardPage() {
         </div>
 
         {/* Recent Enquiries / Leads */}
-        <div className="bg-white/4 border border-white/8 rounded-xl p-5">
+        <div className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold">📥 Recent Enquiries</h2>
-            <Link href="/portal/leads" className="text-xs text-cyan-400 hover:text-cyan-300">View all →</Link>
+            <Link href="/portal/leads" className="text-xs text-amber-300 hover:text-amber-200">View all →</Link>
           </div>
           {recentLeads.length === 0 ? (
             <p className="text-gray-500 text-sm">No enquiries yet</p>
           ) : (
             <div className="space-y-2.5">
               {recentLeads.map(lead => (
-                <div key={lead.id} className="flex items-center justify-between p-3 bg-white/4 rounded-lg">
+                <div key={lead.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                   <div>
                     <p className="text-white text-sm font-medium">{lead.client_name}</p>
                     <p className="text-gray-500 text-xs">{lead.contact_person || "—"} · {new Date(lead.created_at).toLocaleDateString()}</p>
@@ -237,7 +237,7 @@ export default function DashboardPage() {
                   <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                     lead.stage === "Closed Won" ? "bg-green-500/15 text-green-400" :
                     lead.stage === "Closed Lost" ? "bg-red-500/15 text-red-400" :
-                    lead.stage === "New Lead" ? "bg-blue-500/15 text-blue-400" :
+                    lead.stage === "New Lead" ? "bg-amber-300/15 text-amber-200" :
                     "bg-yellow-500/15 text-yellow-400"
                   }`}>
                     {lead.stage}
@@ -249,10 +249,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Lead Pipeline */}
-        <div className="bg-white/4 border border-white/8 rounded-xl p-5">
+        <div className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold">📊 Lead Pipeline</h2>
-            <Link href="/portal/leads" className="text-xs text-cyan-400 hover:text-cyan-300">Manage →</Link>
+            <Link href="/portal/leads" className="text-xs text-amber-300 hover:text-amber-200">Manage →</Link>
           </div>
           <div className="space-y-2.5">
             {pipeline.filter(p => p.count > 0).length === 0 ? (
@@ -277,10 +277,10 @@ export default function DashboardPage() {
         </div>
 
         {/* Upcoming Tasks */}
-        <div className="bg-white/4 border border-white/8 rounded-xl p-5">
+        <div className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold">✅ Upcoming Tasks</h2>
-            <Link href="/portal/tasks" className="text-xs text-cyan-400 hover:text-cyan-300">View all →</Link>
+            <Link href="/portal/tasks" className="text-xs text-amber-300 hover:text-amber-200">View all →</Link>
           </div>
           {upcomingTasks.length === 0 ? (
             <p className="text-gray-500 text-sm">No tasks due this week</p>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
               {upcomingTasks.map(task => {
                 const isToday = task.due_date === new Date().toISOString().split("T")[0];
                 return (
-                  <div key={task.id} className="flex items-center justify-between p-3 bg-white/4 rounded-lg">
+                  <div key={task.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                     <div className="flex-1">
                       <p className="text-white text-sm font-medium">{task.title}</p>
                       <p className={`text-xs mt-0.5 ${isToday ? "text-red-400 font-medium" : "text-gray-500"}`}>
@@ -309,12 +309,12 @@ export default function DashboardPage() {
 
       {/* Today's tasks count */}
       {stats.tasksDueToday > 0 && (
-        <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-4 flex items-center gap-3">
+        <div className="bg-amber-300/10 border border-amber-300/20 rounded-xl p-4 flex items-center gap-3">
           <span className="text-xl">📌</span>
-          <p className="text-cyan-300 text-sm">
+          <p className="text-amber-200 text-sm">
             You have <span className="font-bold">{stats.tasksDueToday} task{stats.tasksDueToday > 1 ? "s" : ""}</span> due today.
           </p>
-          <Link href="/portal/tasks" className="ml-auto text-xs text-cyan-400 hover:text-cyan-300 underline shrink-0">
+          <Link href="/portal/tasks" className="ml-auto text-xs text-amber-300 hover:text-amber-200 underline shrink-0">
             View tasks →
           </Link>
         </div>
@@ -329,7 +329,7 @@ export default function DashboardPage() {
           </div>
           <div className="space-y-2.5">
             {todayFollowups.map(f => (
-              <div key={f.id} className="flex items-center justify-between p-3 bg-white/4 rounded-lg">
+              <div key={f.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
                 <div className="flex items-center gap-3">
                   <span className="text-lg">{FOLLOWUP_TYPE_ICONS[f.type]}</span>
                   <div>
