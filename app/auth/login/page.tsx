@@ -2,6 +2,7 @@
 
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
@@ -56,11 +57,18 @@ function LoginContent() {
       <div className="relative w-full max-w-sm">
         {/* Header */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 mb-5 text-2xl">
-            🔐
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-amber-300/25 mb-5 overflow-hidden">
+            <Image
+              src="/nayab-labs-logo.jpeg"
+              alt="Nayab Labs"
+              width={64}
+              height={64}
+              className="h-full w-full object-cover"
+              priority
+            />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Portal Access</h1>
-          <p className="text-gray-500 text-sm">Amoeba Labs — Internal System</p>
+          <p className="text-gray-500 text-sm">Nayab Labs - Internal System</p>
         </div>
 
         {/* Card */}

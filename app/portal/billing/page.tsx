@@ -229,9 +229,9 @@ export default function BillingPage() {
   <div class="page">
     <div class="header">
       <div class="brand">
-        <h1>AMOEBA LABS</h1>
-        <p>Amoeba Labs · Business Solutions</p>
-        <p style="margin-top:2px;">hello@amoebalabs.com</p>
+        <h1>NAYAB LABS</h1>
+        <p>Nayab Labs - Business Solutions</p>
+        <p style="margin-top:2px;">hello@nayablabs.com</p>
       </div>
       <div class="invoice-meta">
         <div class="inv-label">Invoice</div>
@@ -283,7 +283,7 @@ export default function BillingPage() {
     ${inv.notes ? `<div class="notes-section"><label>Notes</label><p>${inv.notes}</p></div>` : ""}
 
     <div class="footer">
-      <p>Thank you for your business! · Amoeba Labs · amoebalabs.com</p>
+      <p>Thank you for your business! - Nayab Labs - nayablabs.com</p>
     </div>
 
     <div class="no-print" style="text-align:center;margin-top:32px;">

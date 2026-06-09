@@ -4,7 +4,7 @@ export default function ApplyPage() {
       <div className="max-w-4xl mx-auto">
 
         <h1 className="text-5xl font-bold text-center mb-6">
-          Start A Project With Amoeba Labs
+          Start A Project With Nayab Labs
         </h1>
 
         <p className="text-center text-gray-400 mb-12">

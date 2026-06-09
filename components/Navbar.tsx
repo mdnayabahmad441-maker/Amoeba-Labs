@@ -33,15 +33,15 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-3">
           <Image
-            src="/amoeba-labs-logo.jpeg"
-            alt="Amoeba Labs"
+            src="/nayab-labs-logo.jpeg"
+            alt="Nayab Labs"
             width={48}
             height={48}
             priority
-            className="h-12 w-12 rounded-lg object-contain"
+            className="h-12 w-12 rounded-lg object-cover"
           />
           <span className="hidden sm:block font-bold text-white text-lg tracking-tight">
-            Amoeba <span className="text-cyan-400">Labs</span>
+            Nayab <span className="text-amber-300">Labs</span>
           </span>
         </Link>
 

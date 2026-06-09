@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { getCurrentUser, signOut } from "@/lib/auth";
 import Link from "next/link";
+import Image from "next/image";
 import { User } from "@/lib/types";
 
 interface PortalLayoutProps {
@@ -69,7 +70,17 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       >
         {/* Logo */}
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          {sidebarOpen && <h1 className="text-xl font-bold">Amoeba</h1>}
+          <div className="flex items-center gap-3 min-w-0">
+            <Image
+              src="/nayab-labs-logo.jpeg"
+              alt="Nayab Labs"
+              width={36}
+              height={36}
+              className="h-9 w-9 rounded-lg object-cover border border-amber-300/20"
+              priority
+            />
+            {sidebarOpen && <h1 className="text-xl font-bold truncate">Nayab Labs</h1>}
+          </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-1 hover:bg-white/10 rounded-lg transition"

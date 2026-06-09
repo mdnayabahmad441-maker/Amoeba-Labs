@@ -161,7 +161,7 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-7 text-lg text-gray-400 max-w-xl leading-relaxed"
             >
-              Amoeba Labs helps founders, teams, and growing companies plan,
+              Nayab Labs helps founders, teams, and growing companies plan,
               build, automate, and scale. From business strategy and operating
               systems to AI products and execution support, we turn ideas into
               measurable outcomes.

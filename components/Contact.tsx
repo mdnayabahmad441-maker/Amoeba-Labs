@@ -32,7 +32,7 @@ export default function Contact() {
 
             <div className="space-y-6">
               {[
-                { icon: "📧", label: "Email", value: "hello@amoebalabs.com" },
+                { icon: "📧", label: "Email", value: "hello@nayablabs.com" },
                 { icon: "🌍", label: "Location", value: "Remote — Global" },
                 { icon: "⚡", label: "Response Time", value: "Within 24 hours" },
               ].map((item) => (

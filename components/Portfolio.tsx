@@ -24,7 +24,7 @@ export default function Portfolio() {
             </span>
           </h2>
           <p className="text-gray-400 max-w-xl mx-auto text-lg">
-            Companies and products being built inside the Amoeba Labs ecosystem.
+            Companies and products being built inside the Nayab Labs ecosystem.
           </p>
         </motion.div>
 

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { signUp, signInWithGoogle } from "@/lib/auth";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -64,7 +65,15 @@ export default function SignupPage() {
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-white mb-2">Amoeba Labs</h1>
+          <Image
+            src="/nayab-labs-logo.jpeg"
+            alt="Nayab Labs"
+            width={72}
+            height={72}
+            priority
+            className="mx-auto mb-5 h-[72px] w-[72px] rounded-2xl object-cover border border-amber-300/25"
+          />
+          <h1 className="text-4xl font-bold text-white mb-2">Nayab Labs</h1>
           <p className="text-gray-400">Operating System for Business Execution</p>
         </div>
 
@@ -185,7 +194,7 @@ export default function SignupPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-8">
-          &copy; 2024 Amoeba Labs. All rights reserved.
+          &copy; 2024 Nayab Labs. All rights reserved.
         </p>
       </div>
     </div>

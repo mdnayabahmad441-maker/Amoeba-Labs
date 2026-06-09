@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amoeba Labs - Complete Business Solutions",
+  title: "Nayab Labs - Complete Business Solutions",
   description:
-    "Amoeba Labs helps businesses move from strategy to execution with AI, operations, automation, product development, and growth systems.",
+    "Nayab Labs helps businesses move from strategy to execution with AI, operations, automation, product development, and growth systems.",
 };
 
 export default function RootLayout({
