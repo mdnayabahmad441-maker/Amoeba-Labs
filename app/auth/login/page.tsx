@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 function LoginContent() {
   const router = useRouter();
@@ -23,12 +23,24 @@ function LoginContent() {
   }, [searchParams]);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setError("Portal configuration is missing. Please contact support.");
+      return;
+    }
+
     let isMounted = true;
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (isMounted && session) {
-        router.replace("/portal");
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (isMounted && session) {
+          router.replace("/portal");
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setError("Unable to check portal session. Please reload and try again.");
+        }
+      });
     return () => { isMounted = false; };
   }, [router]);
 
