@@ -66,14 +66,14 @@ export default function SignupPage() {
         {/* Header */}
         <div className="text-center mb-10">
           <Image
-            src="/nayab-labs-logo.jpeg"
-            alt="Nayab Labs"
+            src="/groenics-logo.jpeg"
+            alt="Groenics"
             width={72}
             height={72}
             priority
             className="mx-auto mb-5 h-[72px] w-[72px] rounded-2xl object-cover border border-amber-300/25"
           />
-          <h1 className="text-4xl font-bold text-white mb-2">Nayab Labs</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Groenics</h1>
           <p className="text-gray-400">Operating System for Business Execution</p>
         </div>
 
@@ -194,7 +194,7 @@ export default function SignupPage() {
 
         {/* Footer */}
         <p className="text-center text-gray-500 text-xs mt-8">
-          &copy; 2024 Nayab Labs. All rights reserved.
+          &copy; 2024 Groenics. All rights reserved.
         </p>
       </div>
     </div>

@@ -72,14 +72,14 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
         <div className="p-6 border-b border-amber-300/10 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Image
-              src="/nayab-labs-logo.jpeg"
-              alt="Nayab Labs"
+              src="/groenics-logo.jpeg"
+              alt="Groenics"
               width={36}
               height={36}
               className="h-9 w-9 rounded-lg object-cover border border-amber-300/20"
               priority
             />
-            {sidebarOpen && <h1 className="text-xl font-bold truncate">Nayab Labs</h1>}
+            {sidebarOpen && <h1 className="text-xl font-bold truncate">Groenics</h1>}
           </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

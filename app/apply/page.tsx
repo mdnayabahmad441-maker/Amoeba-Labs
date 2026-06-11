@@ -9,7 +9,7 @@ export default function ApplyPage() {
         <h1 className="text-5xl font-bold text-center mb-6">
           Start A Project With{" "}
           <span className="bg-linear-to-r from-amber-100 to-yellow-700 bg-clip-text text-transparent">
-            Nayab Labs
+            Groenics
           </span>
         </h1>
 

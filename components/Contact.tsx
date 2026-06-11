@@ -76,7 +76,7 @@ export default function Contact() {
                       href={item.href}
                       target="_blank"
                       rel="noreferrer"
-                      aria-label="Message Nayab Labs on WhatsApp"
+                      aria-label="Message Groenics on WhatsApp"
                       className="group flex items-center gap-4 p-4 rounded-xl border border-[#25D366]/25 bg-[#25D366]/10 hover:border-[#25D366]/55 hover:bg-[#25D366]/15 transition-all duration-300"
                     >
                       <div className="w-12 h-12 rounded-xl bg-[#25D366] text-black flex items-center justify-center shrink-0 shadow-lg shadow-[#25D366]/15 group-hover:scale-105 transition-transform">

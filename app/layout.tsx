@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nayab Labs - Complete Business Solutions",
+  title: "Groenics - Complete Business Solutions",
   description:
-    "Nayab Labs helps businesses move from strategy to execution with AI, operations, automation, product development, and growth systems.",
+    "Groenics helps businesses move from strategy to execution with AI, operations, automation, product development, and growth systems.",
 };
 
 export default function RootLayout({

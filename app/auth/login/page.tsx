@@ -58,8 +58,8 @@ function LoginContent() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-black border border-amber-300/25 mb-5 overflow-hidden">
             <Image
-              src="/nayab-labs-logo.jpeg"
-              alt="Nayab Labs"
+              src="/groenics-logo.jpeg"
+              alt="Groenics"
               width={64}
               height={64}
               className="h-full w-full object-cover"
@@ -67,7 +67,7 @@ function LoginContent() {
             />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Portal Access</h1>
-          <p className="text-gray-500 text-sm">Nayab Labs - Internal System</p>
+          <p className="text-gray-500 text-sm">Groenics - Internal System</p>
         </div>
 
         {/* Card */}

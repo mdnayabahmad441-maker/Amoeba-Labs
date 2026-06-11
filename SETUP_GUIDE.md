@@ -1,4 +1,4 @@
-# Amoeba Labs - Setup Guide
+# Groenics - Setup Guide
 
 ## Step 1: Create Supabase Database Tables
 

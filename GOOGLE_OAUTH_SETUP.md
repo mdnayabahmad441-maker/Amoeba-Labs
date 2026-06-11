@@ -1,6 +1,6 @@
 # 🔐 Google OAuth Setup Guide
 
-Google OAuth is now integrated into Amoeba Labs! Here's how to enable it:
+Google OAuth is now integrated into Groenics! Here's how to enable it:
 
 ---
 
@@ -12,7 +12,7 @@ Google OAuth is now integrated into Amoeba Labs! Here's how to enable it:
 4. Click **+ Create Credentials** → **OAuth 2.0 Client IDs**
 5. If prompted, configure the OAuth consent screen first:
    - User Type: **External**
-   - App name: **Amoeba Labs**
+   - App name: **Groenics**
    - User support email: Your email
    - Developer contact: Your email
    - Add scopes: **email, profile, openid** (default)

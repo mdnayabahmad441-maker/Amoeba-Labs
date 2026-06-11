@@ -51,7 +51,7 @@ export default function HowWeHelp() {
               </span>
             </h2>
             <p className="mt-6 text-lg text-stone-400 leading-relaxed">
-              Nayab Labs works with businesses that need clearer operations,
+              Groenics works with businesses that need clearer operations,
               better customer follow-up, stronger digital systems, and
               automation that saves real time.
             </p>

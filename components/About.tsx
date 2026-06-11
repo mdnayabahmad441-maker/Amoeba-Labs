@@ -5,12 +5,12 @@ export default function About() {
         <h2 className="text-5xl font-bold mb-8">
           About{" "}
           <span className="bg-linear-to-r from-amber-100 to-yellow-700 bg-clip-text text-transparent">
-            Nayab Labs
+            Groenics
           </span>
         </h2>
 
         <p className="text-xl text-stone-300 leading-relaxed">
-          Nayab Labs is a business solutions company for teams that need both
+          Groenics is a business solutions company for teams that need both
           thinking and execution. We help with strategy, operations, software,
           automation, AI adoption, growth systems, and the day-to-day buildout
           required to move a business forward.

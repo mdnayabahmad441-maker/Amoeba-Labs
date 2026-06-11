@@ -1,4 +1,4 @@
-# 🎯 Quick Start Guide - Amoeba Labs Portal
+# 🎯 Quick Start Guide - Groenics Portal
 
 ## ✅ You've Completed Setup Steps 1-3!
 
@@ -199,6 +199,6 @@ The system is fully customizable:
 
 ## ✨ You're All Set!
 
-Your production-ready Amoeba Labs portal is ready to use. All systems are operational and fully integrated with Supabase.
+Your production-ready Groenics portal is ready to use. All systems are operational and fully integrated with Supabase.
 
 **Happy Building! 🚀**

@@ -16,17 +16,16 @@ export default function Footer() {
           {/* Brand */}
           <div className="flex items-center gap-3">
             <Image
-              src="/nayab-labs-logo.jpeg"
-              alt="Nayab Labs"
+              src="/groenics-logo.jpeg"
+              alt="Groenics"
               width={44}
               height={44}
               className="h-11 w-11 rounded-lg object-cover"
             />
             <div>
               <h3 className="text-xl font-bold tracking-tight">
-                NAYAB{" "}
                 <span className="bg-linear-to-r from-amber-100 to-yellow-700 bg-clip-text text-transparent">
-                  LABS
+                  GROENICS
                 </span>
               </h3>
               <p className="text-gray-600 text-sm mt-1">
@@ -50,7 +49,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-gray-700 text-sm">
-            &copy; 2025 Nayab Labs
+            &copy; 2025 Groenics
           </p>
         </div>
       </div>

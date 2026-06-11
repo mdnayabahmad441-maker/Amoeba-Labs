@@ -1,7 +1,7 @@
 import PortalLayout from "@/components/PortalLayout";
 
 export const metadata = {
-  title: "Nayab Labs Portal",
+  title: "Groenics Portal",
   description: "Operating system for business execution and growth",
 };
 

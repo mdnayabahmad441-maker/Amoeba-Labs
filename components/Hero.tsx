@@ -46,7 +46,7 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-8 text-lg text-stone-300 max-w-xl leading-relaxed"
             >
-              Nayab Labs helps businesses turn scattered work into clear
+              Groenics helps businesses turn scattered work into clear
               strategy, automated operations, better sales follow-up, and
               software that keeps the company moving.
             </motion.p>
