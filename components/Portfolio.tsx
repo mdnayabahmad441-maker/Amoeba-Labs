@@ -2,6 +2,13 @@
 
 import { motion } from "framer-motion";
 
+const metricTiles = [
+  { mark: "ERP", label: "Target", value: "Schools" },
+  { mark: "10+", label: "ERP Modules", value: "10+" },
+  { mark: "AI", label: "AI Questions", value: "NEET/JEE/CBSE" },
+  { mark: "SaaS", label: "Deployment", value: "SaaS" },
+];
+
 export default function Portfolio() {
   return (
     <section id="portfolio" className="py-28 px-6">
@@ -82,7 +89,54 @@ export default function Portfolio() {
                 </div>
 
                 {/* Right — mini metrics */}
-                <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="relative mb-3 h-44 overflow-hidden rounded-2xl border border-amber-300/10 bg-black/25 p-4">
+                    <div className="absolute inset-0 opacity-[0.12] bg-[linear-gradient(rgba(244,213,138,0.45)_1px,transparent_1px),linear-gradient(to_right,rgba(244,213,138,0.45)_1px,transparent_1px)] bg-[size:24px_24px]" />
+                    <div className="relative flex h-full flex-col justify-between">
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-xs uppercase tracking-[0.24em] text-amber-100/60">educore.os</span>
+                        <motion.span
+                          animate={{ opacity: [0.35, 1, 0.35] }}
+                          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                          className="h-2 w-2 rounded-full bg-amber-300"
+                        />
+                      </div>
+                      <div className="grid grid-cols-5 gap-2">
+                        {Array.from({ length: 15 }).map((_, index) => (
+                          <motion.span
+                            key={index}
+                            animate={{ opacity: [0.2, 0.8, 0.35], scaleY: [0.55, 1, 0.7] }}
+                            transition={{ duration: 2.4, delay: index * 0.06, repeat: Infinity, ease: "easeInOut" }}
+                            className="h-14 origin-bottom rounded-sm border border-amber-300/10 bg-amber-300/10"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    {metricTiles.map((m, index) => (
+                      <motion.div
+                        key={m.label}
+                        whileHover={{ y: -4 }}
+                        className="relative overflow-hidden bg-black/20 border border-amber-300/10 rounded-2xl p-4"
+                      >
+                        <motion.span
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 18 + index * 2, repeat: Infinity, ease: "linear" }}
+                          className="absolute right-3 top-3 h-8 w-8 rounded-full border border-dashed border-amber-300/15"
+                        />
+                        <span className="relative mb-2 flex h-9 w-9 items-center justify-center rounded-lg border border-amber-300/15 bg-amber-300/8 font-mono text-[0.65rem] font-bold text-amber-200">
+                          {m.mark}
+                        </span>
+                        <div className="relative text-white font-bold text-lg">{m.value}</div>
+                        <div className="relative text-gray-500 text-xs mt-0.5">{m.label}</div>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="hidden grid-cols-2 gap-3">
                   {[
                     { icon: "🏫", label: "Target", value: "Schools" },
                     { icon: "📦", label: "ERP Modules", value: "10+" },

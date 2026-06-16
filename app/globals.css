@@ -30,9 +30,15 @@ html {
   0%, 100% { transform: translateX(-22%); opacity: 0.52; }
   50% { transform: translateX(18%); opacity: 1; }
 }
+@keyframes hero-scan {
+  0% { transform: translateY(-100%); opacity: 0; }
+  18% { opacity: 1; }
+  100% { transform: translateY(140vh); opacity: 0; }
+}
 .animate-float { animation: float 7s ease-in-out infinite; }
 .animate-float-delayed { animation: float-delayed 9s ease-in-out infinite 2s; }
 .hero-signal { animation: signal-fill 3.6s ease-in-out infinite; }
+.hero-scan { animation: hero-scan 4.8s linear infinite; }
 .text-shimmer {
   background: linear-gradient(90deg, #8f6424 0%, #f8e7b0 38%, #c89132 62%, #fff8dc 100%);
   background-size: 200% auto;

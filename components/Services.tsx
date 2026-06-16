@@ -59,6 +59,34 @@ const services = [
   },
 ];
 
+function ServiceGraphic({ index }: { index: number }) {
+  return (
+    <div className="relative h-20 overflow-hidden rounded-xl border border-amber-300/10 bg-black/20">
+      <div className="absolute inset-0 opacity-[0.13] bg-[linear-gradient(rgba(244,213,138,0.45)_1px,transparent_1px),linear-gradient(to_right,rgba(244,213,138,0.45)_1px,transparent_1px)] bg-[size:18px_18px]" />
+      <motion.div
+        animate={{ x: ["-20%", "120%"] }}
+        transition={{ duration: 3.2 + index * 0.2, repeat: Infinity, ease: "linear" }}
+        className="absolute top-1/2 h-px w-24 bg-linear-to-r from-transparent via-amber-200/70 to-transparent"
+      />
+      <div className="absolute inset-4 flex items-end gap-2">
+        {[0, 1, 2, 3].map((bar) => (
+          <motion.span
+            key={bar}
+            animate={{ scaleY: [0.45, 1, 0.58], opacity: [0.35, 0.9, 0.45] }}
+            transition={{ duration: 2.2, delay: bar * 0.16 + index * 0.05, repeat: Infinity, ease: "easeInOut" }}
+            className="h-full flex-1 origin-bottom rounded-sm border border-amber-300/10 bg-amber-300/10"
+          />
+        ))}
+      </div>
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
+        className="absolute right-4 top-4 h-9 w-9 rounded-full border border-dashed border-amber-300/25"
+      />
+    </div>
+  );
+}
+
 export default function Services() {
   return (
     <section id="services" className="py-28 px-6">
@@ -94,10 +122,12 @@ export default function Services() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.55, delay: i * 0.07 }}
+              whileHover={{ y: -8 }}
             >
               <div className={`p-px rounded-2xl bg-linear-to-br ${service.border} h-full`}>
                 <div className="group rounded-2xl brand-panel hover:bg-[#15120c] transition-all duration-300 p-7 h-full flex flex-col relative overflow-hidden">
                   <div className={`absolute inset-0 bg-linear-to-br ${service.accent} opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl`} />
+                  <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-amber-300/35 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                   <div className="relative z-10 flex flex-col h-full">
                     <div className="flex items-start justify-between mb-5">
@@ -113,6 +143,10 @@ export default function Services() {
                     <p className="text-gray-500 text-sm leading-relaxed flex-1">
                       {service.description}
                     </p>
+
+                    <div className="mt-6">
+                      <ServiceGraphic index={i} />
+                    </div>
 
                     <div className="mt-5 flex items-center gap-1.5 text-xs text-gray-600 group-hover:text-amber-300 transition-colors duration-300">
                       <span>Learn more</span>
