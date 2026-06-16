@@ -60,16 +60,33 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     return pathname.startsWith(href);
   };
 
+  const handleNavClick = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex">
+    <div className="min-h-screen bg-[#050505] text-white md:flex">
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Close sidebar overlay"
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 z-30 bg-black/60 md:hidden"
+        />
+      )}
+
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-0 h-full bg-[#0b0a08] border-r border-amber-300/10 transition-all duration-300 z-40 ${
-          sidebarOpen ? "w-64" : "w-20"
+          sidebarOpen
+            ? "w-72 translate-x-0 md:w-64"
+            : "w-72 -translate-x-full md:w-20 md:translate-x-0"
         }`}
       >
         {/* Logo */}
-        <div className="p-6 border-b border-amber-300/10 flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-amber-300/10 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Image
               src="/groenics-logo.jpeg"
@@ -83,18 +100,20 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
           </div>
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="p-1 hover:bg-amber-300/10 rounded-lg transition"
+            className="p-2 hover:bg-amber-300/10 rounded-lg transition"
+            aria-label={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
           >
             {sidebarOpen ? "←" : "→"}
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-2">
+        <nav className="p-3 sm:p-4 space-y-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleNavClick}
               className={`flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                 isActive(item.href)
                   ? "bg-amber-300/20 text-amber-300 border border-amber-300/50"
@@ -121,19 +140,29 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+      <main className={`min-w-0 flex-1 transition-all duration-300 ${sidebarOpen ? "md:ml-64" : "md:ml-20"}`}>
         {/* Top Bar */}
-        <header className="bg-[#0b0a08] border-b border-amber-300/10 px-8 py-4 flex items-center justify-between">
-          <h2 className="text-sm text-gray-400">
-            Welcome, <span className="text-white font-semibold">{user?.email?.split("@")[0]}</span>
-          </h2>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-400">{new Date().toLocaleDateString()}</span>
+        <header className="sticky top-0 z-20 bg-[#0b0a08]/95 border-b border-amber-300/10 px-4 py-3 backdrop-blur sm:px-6 md:px-8 md:py-4">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-amber-300/10 bg-amber-300/5 text-lg text-amber-200 transition hover:bg-amber-300/10 md:hidden"
+              aria-label="Open sidebar"
+            >
+              ☰
+            </button>
+            <h2 className="min-w-0 flex-1 truncate text-sm text-gray-400">
+              Welcome, <span className="text-white font-semibold">{user?.email?.split("@")[0]}</span>
+            </h2>
+            <div className="flex items-center gap-4">
+              <span className="whitespace-nowrap text-xs text-gray-400 sm:text-sm">{new Date().toLocaleDateString()}</span>
+            </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <div className="p-8">{children}</div>
+        <div className="p-4 sm:p-6 md:p-8">{children}</div>
       </main>
     </div>
   );

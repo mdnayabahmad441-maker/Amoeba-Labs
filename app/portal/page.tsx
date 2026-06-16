@@ -148,13 +148,13 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-white">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-white sm:text-4xl">Dashboard</h1>
         <p className="text-gray-400 mt-1">Your business at a glance</p>
       </div>
 
       {/* Overdue alert */}
       {overdueInvoices.length > 0 && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex items-start gap-3">
+        <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 flex flex-wrap items-start gap-3">
           <span className="text-xl">⚠️</span>
           <div className="flex-1">
             <p className="text-red-300 font-semibold text-sm">
@@ -171,14 +171,14 @@ export default function DashboardPage() {
       )}
 
       {/* Top Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: "Total Revenue", value: `₹${stats.totalRevenue.toLocaleString()}`, sub: "Paid invoices", icon: "💰", color: "text-green-400" },
           { label: "Pending Payments", value: `₹${stats.pendingAmount.toLocaleString()}`, sub: "Awaiting payment", icon: "⏳", color: "text-yellow-400" },
           { label: "Total Clients", value: stats.totalClients, sub: `${stats.activeClients} active`, icon: "🏢", color: "text-amber-300" },
           { label: "Total Leads", value: stats.totalLeads, sub: "In pipeline", icon: "👥", color: "text-stone-300" },
         ].map(card => (
-          <div key={card.label} className="bg-black/20 border border-amber-300/10 rounded-xl p-5">
+          <div key={card.label} className="bg-black/20 border border-amber-300/10 rounded-xl p-4 sm:p-5">
             <div className="flex items-center justify-between mb-3">
               <span className="text-2xl">{card.icon}</span>
               <span className="text-xs text-gray-500">{card.sub}</span>
@@ -203,12 +203,12 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2.5">
               {recentPayments.map(inv => (
-                <div key={inv.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
+                <div key={inv.id} className="flex flex-col gap-2 p-3 bg-black/20 rounded-lg sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-white text-sm font-medium">{inv.client_name}</p>
                     <p className="text-gray-500 text-xs">{inv.invoice_number} · {new Date(inv.created_at).toLocaleDateString()}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <p className="text-green-400 font-bold text-sm">₹{inv.amount.toLocaleString()}</p>
                     <span className="text-xs bg-green-500/15 text-green-400 px-2 py-0.5 rounded-full">Paid</span>
                   </div>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-2.5">
               {recentLeads.map(lead => (
-                <div key={lead.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
+                <div key={lead.id} className="flex flex-col gap-2 p-3 bg-black/20 rounded-lg sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-white text-sm font-medium">{lead.client_name}</p>
                     <p className="text-gray-500 text-xs">{lead.contact_person || "—"} · {new Date(lead.created_at).toLocaleDateString()}</p>
@@ -260,7 +260,7 @@ export default function DashboardPage() {
             ) : (
               pipeline.map(p => (
                 <div key={p.stage} className="flex items-center gap-3">
-                  <div className="w-24 shrink-0">
+                  <div className="w-20 shrink-0 sm:w-24">
                     <span className="text-gray-400 text-xs">{p.stage}</span>
                   </div>
                   <div className="flex-1 h-2 bg-white/8 rounded-full overflow-hidden">
@@ -289,7 +289,7 @@ export default function DashboardPage() {
               {upcomingTasks.map(task => {
                 const isToday = task.due_date === new Date().toISOString().split("T")[0];
                 return (
-                  <div key={task.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
+                  <div key={task.id} className="flex items-center justify-between gap-3 p-3 bg-black/20 rounded-lg">
                     <div className="flex-1">
                       <p className="text-white text-sm font-medium">{task.title}</p>
                       <p className={`text-xs mt-0.5 ${isToday ? "text-red-400 font-medium" : "text-gray-500"}`}>
@@ -309,7 +309,7 @@ export default function DashboardPage() {
 
       {/* Today's tasks count */}
       {stats.tasksDueToday > 0 && (
-        <div className="bg-amber-300/10 border border-amber-300/20 rounded-xl p-4 flex items-center gap-3">
+        <div className="bg-amber-300/10 border border-amber-300/20 rounded-xl p-4 flex flex-wrap items-center gap-3">
           <span className="text-xl">📌</span>
           <p className="text-amber-200 text-sm">
             You have <span className="font-bold">{stats.tasksDueToday} task{stats.tasksDueToday > 1 ? "s" : ""}</span> due today.
@@ -329,10 +329,10 @@ export default function DashboardPage() {
           </div>
           <div className="space-y-2.5">
             {todayFollowups.map(f => (
-              <div key={f.id} className="flex items-center justify-between p-3 bg-black/20 rounded-lg">
-                <div className="flex items-center gap-3">
+              <div key={f.id} className="flex flex-col gap-3 p-3 bg-black/20 rounded-lg sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-3">
                   <span className="text-lg">{FOLLOWUP_TYPE_ICONS[f.type]}</span>
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-white text-sm font-medium">{f.contact_name}</p>
                     <p className="text-gray-500 text-xs">{f.type}{f.notes ? ` · ${f.notes.slice(0, 40)}` : ""}</p>
                   </div>

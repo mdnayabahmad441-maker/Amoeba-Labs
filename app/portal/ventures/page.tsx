@@ -135,14 +135,14 @@ export default function VenturesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Ventures</h1>
+          <h1 className="text-3xl font-bold text-white mb-2 sm:text-4xl">Ventures</h1>
           <p className="text-gray-400">Manage your venture portfolio</p>
         </div>
         <button
           onClick={handleAddVenture}
-          className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition"
+          className="w-full bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition sm:w-auto"
         >
           + Add Venture
         </button>
@@ -211,7 +211,7 @@ export default function VenturesPage() {
             },
           ]}
           actions={(venture) => (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => handleEditVenture(venture)}
                 className="text-xs px-2 py-1 bg-amber-300/20 text-amber-200 rounded hover:bg-amber-300/30 transition"
@@ -273,7 +273,7 @@ export default function VenturesPage() {
             ]}
           />
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button
               type="submit"
               disabled={submitting}

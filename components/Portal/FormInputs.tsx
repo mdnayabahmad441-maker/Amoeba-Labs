@@ -74,7 +74,7 @@ export function FormSelect({ label, error, value, onChange, options, required, p
         onClick={() => setOpen(prev => !prev)}
         className="w-full px-4 py-2.5 bg-black/20 border border-amber-300/10 rounded-xl text-left text-sm flex items-center justify-between gap-2 focus:outline-none focus:border-amber-300/50 transition-all"
       >
-        <span className={selected ? "text-white" : "text-gray-600"}>
+        <span className={`min-w-0 truncate ${selected ? "text-white" : "text-gray-600"}`}>
           {selected?.label ?? placeholder ?? "Select…"}
         </span>
         <svg

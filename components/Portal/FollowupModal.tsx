@@ -74,7 +74,7 @@ export default function FollowupModal({
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>}
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormSelect
             label="Type *"
             value={formData.type}
@@ -94,7 +94,7 @@ export default function FollowupModal({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormInput
             label="Date *"
             type="date"
@@ -118,7 +118,7 @@ export default function FollowupModal({
           rows={4}
         />
 
-        <div className="flex gap-3 pt-1">
+        <div className="flex flex-col gap-3 pt-1 sm:flex-row">
           <button type="submit" disabled={submitting}
             className="flex-1 bg-amber-300 hover:bg-amber-200 disabled:bg-amber-300/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
             {submitting ? "Saving..." : "Log Follow-up"}

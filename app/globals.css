@@ -26,8 +26,13 @@ html {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
 }
+@keyframes signal-fill {
+  0%, 100% { transform: translateX(-22%); opacity: 0.52; }
+  50% { transform: translateX(18%); opacity: 1; }
+}
 .animate-float { animation: float 7s ease-in-out infinite; }
 .animate-float-delayed { animation: float-delayed 9s ease-in-out infinite 2s; }
+.hero-signal { animation: signal-fill 3.6s ease-in-out infinite; }
 .text-shimmer {
   background: linear-gradient(90deg, #8f6424 0%, #f8e7b0 38%, #c89132 62%, #fff8dc 100%);
   background-size: 200% auto;

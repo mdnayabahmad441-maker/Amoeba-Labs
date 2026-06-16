@@ -320,14 +320,14 @@ export default function BillingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Billing & Payments</h1>
           <p className="text-gray-400 mt-1">Manage invoices, track payments</p>
         </div>
         <button
           onClick={openAddModal}
-          className="bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
+          className="w-full bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm sm:w-auto"
         >
           + Create Invoice
         </button>
@@ -388,12 +388,12 @@ export default function BillingPage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                 {/* Invoice info */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="text-white font-semibold text-sm">{inv.client_name}</span>
                     <span className="text-gray-500 text-xs">·</span>
                     <span className="text-gray-400 text-xs font-mono">{inv.invoice_number}</span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
+                  <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500">
                     <span>Due: {new Date(inv.due_date).toLocaleDateString()}</span>
                     {inv.notes && <span className="truncate max-w-xs">· {inv.notes}</span>}
                   </div>
@@ -412,7 +412,7 @@ export default function BillingPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center gap-2 sm:w-auto">
+                <div className="flex flex-wrap items-center gap-2 sm:w-auto">
                   {inv.status !== "Paid" && inv.status !== "Cancelled" && (
                     <button
                       onClick={() => markAsPaid(inv.id)}
@@ -473,7 +473,7 @@ export default function BillingPage() {
             required
           />
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormInput
               label="Invoice Number *"
               type="text"
@@ -517,7 +517,7 @@ export default function BillingPage() {
             rows={3}
           />
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button
               type="submit"
               disabled={submitting}

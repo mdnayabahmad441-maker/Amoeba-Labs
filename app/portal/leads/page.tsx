@@ -157,14 +157,14 @@ export default function LeadsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Leads CRM</h1>
+          <h1 className="text-3xl font-bold text-white mb-2 sm:text-4xl">Leads CRM</h1>
           <p className="text-gray-400">Track and manage your sales pipeline</p>
         </div>
         <button
           onClick={openAddModal}
-          className="bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition"
+          className="w-full bg-amber-300 hover:bg-amber-400 text-black font-semibold px-6 py-3 rounded-lg transition sm:w-auto"
         >
           + Add Lead
         </button>
@@ -231,7 +231,7 @@ export default function LeadsPage() {
             },
           ]}
           actions={(lead) => (
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setFollowupLead(lead)}
                 className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded hover:bg-yellow-500/30 transition font-medium"
@@ -327,7 +327,7 @@ export default function LeadsPage() {
             rows={3}
           />
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button
               type="submit"
               disabled={submitting}

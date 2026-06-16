@@ -184,14 +184,14 @@ export default function FollowupsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white">Follow-ups</h1>
           <p className="text-gray-400 mt-1">Track every client and lead interaction</p>
         </div>
         <button
           onClick={openAddModal}
-          className="bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm"
+          className="w-full bg-amber-300 hover:bg-amber-200 text-black font-bold px-5 py-2.5 rounded-xl transition text-sm sm:w-auto"
         >
           + Log Follow-up
         </button>
@@ -262,7 +262,7 @@ export default function FollowupsPage() {
                       {FOLLOWUP_TYPE_ICONS[f.type]}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-0.5">
+                      <div className="flex flex-wrap items-center gap-2 mb-0.5">
                         <span className="text-white font-semibold text-sm">{f.contact_name}</span>
                         <span className={`text-xs px-2 py-0.5 rounded-full border ${
                           f.contact_type === "client"
@@ -295,7 +295,7 @@ export default function FollowupsPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex flex-wrap items-center gap-2 shrink-0">
                     {f.status === "Pending" && (
                       <button onClick={() => markDone(f.id)}
                         className="text-xs px-3 py-1.5 bg-green-500/15 text-green-400 border border-green-500/25 rounded-lg hover:bg-green-500/25 transition font-medium">
@@ -322,7 +322,7 @@ export default function FollowupsPage() {
       <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingId ? "Edit Follow-up" : "Log Follow-up"}>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Link to Client or Lead */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <FormSelect
               label="Client (optional)"
               value={formData.client_id || ""}
@@ -337,7 +337,7 @@ export default function FollowupsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <FormSelect
               label="Type *"
               value={formData.type}
@@ -358,7 +358,7 @@ export default function FollowupsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <FormInput
               label="Follow-up Date *"
               type="date"
@@ -382,7 +382,7 @@ export default function FollowupsPage() {
             rows={4}
           />
 
-          <div className="flex gap-3 pt-2">
+          <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="submit" disabled={submitting}
               className="flex-1 bg-amber-300 hover:bg-amber-200 disabled:bg-amber-300/40 text-black font-bold py-2.5 rounded-xl transition text-sm">
               {submitting ? "Saving..." : editingId ? "Update" : "Log Follow-up"}
