@@ -2,6 +2,7 @@ import Image from "next/image";
 
 export default function Footer() {
   const links = [
+    { label: "Who We Help", href: "#industries" },
     { label: "Services", href: "#services" },
     { label: "Portfolio", href: "#portfolio" },
     { label: "About", href: "#about" },

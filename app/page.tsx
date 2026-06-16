@@ -2,6 +2,7 @@ import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Stats from "../components/Stats";
 import HowWeHelp from "../components/HowWeHelp";
+import Industries from "../components/Industries";
 import Services from "../components/Services";
 import Portfolio from "../components/Portfolio";
 import FounderProgram from "../components/FounderProgram";
@@ -15,6 +16,7 @@ export default function Home() {
       <Hero />
       <Stats />
       <HowWeHelp />
+      <Industries />
       <Services />
       <Portfolio />
       <FounderProgram />
