@@ -3,10 +3,10 @@
 import { motion } from "framer-motion";
 
 const stats = [
-  { value: "360", label: "Business View", sub: "Strategy, systems, growth" },
-  { value: "AI", label: "Enabled Execution", sub: "Automation where it matters" },
-  { value: "End", label: "To End Delivery", sub: "Plan, build, launch, improve" },
-  { value: "2025", label: "Founded", sub: "Built for modern businesses" },
+  { value: "01", label: "Problems First", sub: "We diagnose before building" },
+  { value: "AI", label: "Used With Purpose", sub: "Automation where it pays off" },
+  { value: "$", label: "Measurable Impact", sub: "Savings, revenue, speed" },
+  { value: "360", label: "Business View", sub: "Sales, ops, support, finance" },
 ];
 
 const signalWidths = ["w-10", "w-16", "w-12"];

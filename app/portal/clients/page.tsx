@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Client, CreateClientInput, CLIENT_TYPES, ClientType } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
 import FollowupModal from "@/components/Portal/FollowupModal";
+import WhatsAppMessageModal from "@/components/Portal/WhatsAppMessageModal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { LoadingState, EmptyState } from "@/components/Portal/States";
 import DataTable from "@/components/Portal/DataTable";
@@ -32,6 +33,7 @@ export default function ClientsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [ventureId, setVentureId] = useState("");
   const [followupClient, setFollowupClient] = useState<Client | null>(null);
+  const [messageClient, setMessageClient] = useState<Client | null>(null);
 
   const [formData, setFormData] = useState<CreateClientInput>({
     client_name: "",
@@ -280,6 +282,12 @@ export default function ClientsPage() {
           actions={(client) => (
             <div className="flex flex-wrap gap-2">
               <button
+                onClick={() => setMessageClient(client)}
+                className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded hover:bg-green-500/30 transition font-medium"
+              >
+                WhatsApp
+              </button>
+              <button
                 onClick={() => setFollowupClient(client)}
                 className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded hover:bg-yellow-500/30 transition font-medium"
               >
@@ -420,6 +428,18 @@ export default function ClientsPage() {
           ventureId={ventureId}
           clientId={followupClient.id}
           contactName={followupClient.client_name}
+        />
+      )}
+
+      {messageClient && (
+        <WhatsAppMessageModal
+          isOpen={!!messageClient}
+          onClose={() => setMessageClient(null)}
+          onSent={() => loadData()}
+          ventureId={ventureId}
+          clientId={messageClient.id}
+          contactName={messageClient.owner_name || messageClient.client_name}
+          phone={messageClient.phone}
         />
       )}
     </div>

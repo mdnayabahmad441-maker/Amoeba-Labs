@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { Lead, CreateLeadInput, LEAD_STAGES } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
 import FollowupModal from "@/components/Portal/FollowupModal";
+import WhatsAppMessageModal from "@/components/Portal/WhatsAppMessageModal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { LoadingState, EmptyState } from "@/components/Portal/States";
 import DataTable from "@/components/Portal/DataTable";
@@ -20,6 +21,7 @@ export default function LeadsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [ventureId, setVentureId] = useState("");
   const [followupLead, setFollowupLead] = useState<Lead | null>(null);
+  const [messageLead, setMessageLead] = useState<Lead | null>(null);
 
   const [formData, setFormData] = useState<CreateLeadInput>({
     client_name: "",
@@ -233,6 +235,12 @@ export default function LeadsPage() {
           actions={(lead) => (
             <div className="flex flex-wrap gap-2">
               <button
+                onClick={() => setMessageLead(lead)}
+                className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded hover:bg-green-500/30 transition font-medium"
+              >
+                WhatsApp
+              </button>
+              <button
                 onClick={() => setFollowupLead(lead)}
                 className="text-xs px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded hover:bg-yellow-500/30 transition font-medium"
               >
@@ -355,6 +363,18 @@ export default function LeadsPage() {
           ventureId={ventureId}
           leadId={followupLead.id}
           contactName={followupLead.client_name}
+        />
+      )}
+
+      {messageLead && (
+        <WhatsAppMessageModal
+          isOpen={!!messageLead}
+          onClose={() => setMessageLead(null)}
+          onSent={() => loadData()}
+          ventureId={ventureId}
+          leadId={messageLead.id}
+          contactName={messageLead.contact_person || messageLead.client_name}
+          phone={messageLead.phone}
         />
       )}
     </div>

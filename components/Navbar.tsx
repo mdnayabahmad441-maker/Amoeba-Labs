@@ -16,15 +16,15 @@ export default function Navbar() {
 
   const navLinks = [
     { label: "Who We Help", href: "#industries" },
-    { label: "Services", href: "#services" },
-    { label: "Portfolio", href: "#portfolio" },
-    { label: "About", href: "#about" },
+    { label: "Problems", href: "#services" },
+    { label: "Framework", href: "#framework" },
+    { label: "Assessment", href: "#assessment" },
     { label: "Contact", href: "#contact" },
   ];
 
   return (
     <header
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 w-full z-[100] transition-all duration-300 ${
         scrolled
           ? "bg-[#050505]/95 backdrop-blur-md border-b border-white/10 shadow-lg shadow-black/20"
           : "bg-transparent"
@@ -71,7 +71,7 @@ export default function Navbar() {
             href="#contact"
             className="bg-amber-300 hover:bg-amber-200 text-black font-semibold px-5 py-2.5 rounded-full text-sm transition-all duration-300"
           >
-            Build With Us
+            Free Assessment
           </a>
         </div>
 
@@ -115,7 +115,11 @@ export default function Navbar() {
             </a>
           ))}
           <div className="pt-4 border-t border-white/10 flex flex-col gap-3">
-            <Link href="/auth/login" className="text-sm text-gray-400 hover:text-white transition">
+            <Link
+              href="/auth/login"
+              onClick={() => setMenuOpen(false)}
+              className="text-sm text-gray-400 hover:text-white transition"
+            >
               Portal Login
             </Link>
             <a
@@ -123,7 +127,7 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className="bg-amber-300 hover:bg-amber-200 text-black font-semibold px-5 py-3 rounded-full text-sm text-center transition"
             >
-              Build With Us
+              Free Assessment
             </a>
           </div>
         </div>

@@ -5,33 +5,45 @@ import { motion } from "framer-motion";
 const helpItems = [
   {
     number: "01",
-    title: "Find what is slowing the business down",
+    title: "Understand your business",
     description:
-      "We map your current work, sales flow, tools, team process, and reporting gaps so the next move is based on reality.",
+      "We learn how your revenue, operations, people, tools, customers, and management routines actually work today.",
   },
   {
     number: "02",
-    title: "Design a practical operating system",
+    title: "Identify hidden problems",
     description:
-      "We turn scattered tasks into clear workflows, dashboards, ownership, follow-ups, and measurable business routines.",
+      "We find revenue leaks, time waste, manual processes, customer experience issues, sales inefficiencies, and reporting gaps.",
   },
   {
     number: "03",
-    title: "Build software and automation where it matters",
+    title: "Prioritize what matters most",
     description:
-      "We create portals, CRMs, websites, AI workflows, and internal tools that reduce manual work and improve execution.",
+      "We estimate impact, effort, savings, and risk so the first solution targets the problem with the strongest business case.",
   },
   {
     number: "04",
-    title: "Keep improving with data and follow-through",
+    title: "Build the right AI solution",
     description:
-      "We help track performance, improve bottlenecks, and keep the system useful as your business changes.",
+      "We design AI workflows, automations, dashboards, CRMs, internal tools, or custom software around the business problem.",
+  },
+  {
+    number: "05",
+    title: "Implement and automate",
+    description:
+      "We connect the solution to your team, tools, data, approvals, and daily workflows so it becomes part of how work gets done.",
+  },
+  {
+    number: "06",
+    title: "Measure results and continuously improve",
+    description:
+      "We track time saved, revenue recovered, cycle time, customer experience, and operating visibility, then keep improving the system.",
   },
 ];
 
 export default function HowWeHelp() {
   return (
-    <section className="px-6 py-24">
+    <section id="framework" className="px-6 py-24">
       <div className="max-w-7xl mx-auto">
         <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
           <motion.div
@@ -42,18 +54,18 @@ export default function HowWeHelp() {
             className="lg:sticky lg:top-28"
           >
             <p className="text-amber-300 uppercase tracking-[0.3em] text-xs font-semibold mb-5">
-              How We Help
+              Groenics Business Problem Framework
             </p>
             <h2 className="text-4xl md:text-5xl font-bold leading-tight">
-              We make your business{" "}
+              Business first, technology{" "}
               <span className="bg-linear-to-r from-amber-100 to-yellow-700 bg-clip-text text-transparent">
-                easier to run
+                second
               </span>
             </h2>
             <p className="mt-6 text-lg text-stone-400 leading-relaxed">
-              Groenics works with businesses that need clearer operations,
-              better customer follow-up, stronger digital systems, and
-              automation that saves real time.
+              We do not begin with a tool demo. We begin by understanding the
+              business problem, the cost of leaving it unsolved, and the result
+              that would make the project worth doing.
             </p>
 
             <motion.div
@@ -70,7 +82,7 @@ export default function HowWeHelp() {
                   transition={{ duration: 24, repeat: Infinity, ease: "linear" }}
                   className="absolute left-1/2 top-1/2 h-36 w-36 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-amber-300/18"
                 />
-                {["Strategy", "Data", "Tools", "Growth"].map((label, index) => {
+                {["Problem", "Impact", "Solution", "Result"].map((label, index) => {
                   const positions = [
                     "left-2 top-4",
                     "right-3 top-7",

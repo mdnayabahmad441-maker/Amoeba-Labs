@@ -3,11 +3,11 @@ import Image from "next/image";
 export default function Footer() {
   const links = [
     { label: "Who We Help", href: "#industries" },
-    { label: "Services", href: "#services" },
+    { label: "Problems", href: "#services" },
+    { label: "Framework", href: "#framework" },
+    { label: "Assessment", href: "#assessment" },
     { label: "Portfolio", href: "#portfolio" },
-    { label: "About", href: "#about" },
     { label: "Contact", href: "#contact" },
-    { label: "Apply", href: "/apply" },
   ];
 
   return (
@@ -30,7 +30,7 @@ export default function Footer() {
                 </span>
               </h3>
               <p className="text-gray-600 text-sm mt-1">
-                Strategy, systems, AI, and execution.
+                Business problem solving with AI, automation, and software.
               </p>
             </div>
           </div>

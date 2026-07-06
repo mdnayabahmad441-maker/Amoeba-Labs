@@ -133,7 +133,7 @@ export interface Invoice {
   amount: number;
   invoice_number: string;
   due_date: string;
-  status: "Draft" | "Sent" | "Paid" | "Overdue" | "Cancelled";
+  status: "Draft" | "Sent" | "Partially Paid" | "Paid" | "Overdue" | "Cancelled";
   notes: string | null;
   created_at: string;
   updated_at: string;
@@ -148,7 +148,131 @@ export interface CreateInvoiceInput {
   notes?: string;
 }
 
-export const INVOICE_STATUSES = ["Draft", "Sent", "Paid", "Overdue", "Cancelled"] as const;
+export interface InvoiceItem {
+  id: string;
+  invoice_id: string;
+  service_name: string;
+  description: string | null;
+  quantity: number;
+  rate: number;
+  amount: number;
+  created_at: string;
+}
+
+export interface Payment {
+  id: string;
+  invoice_id: string;
+  amount: number;
+  payment_date: string;
+  method: "UPI" | "Bank Transfer" | "Cash" | "Card" | "Razorpay" | "Stripe" | "Other";
+  reference: string | null;
+  notes: string | null;
+  created_at: string;
+}
+
+export const INVOICE_STATUSES = ["Draft", "Sent", "Partially Paid", "Paid", "Overdue", "Cancelled"] as const;
+export const PAYMENT_METHODS = ["UPI", "Bank Transfer", "Cash", "Card", "Razorpay", "Stripe", "Other"] as const;
+
+// ==================== Business Settings ====================
+export interface BusinessSettings {
+  id: string;
+  venture_id: string;
+  business_name: string;
+  legal_name: string | null;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  website: string | null;
+  tax_id: string | null;
+  bank_details: string | null;
+  upi_id: string | null;
+  invoice_prefix: string;
+  proposal_prefix: string;
+  default_payment_terms: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateBusinessSettingsInput {
+  business_name: string;
+  legal_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  website?: string;
+  tax_id?: string;
+  bank_details?: string;
+  upi_id?: string;
+  invoice_prefix?: string;
+  proposal_prefix?: string;
+  default_payment_terms?: string;
+}
+
+// ==================== Proposals ====================
+export const PROPOSAL_STATUSES = ["Draft", "Sent", "Accepted", "Rejected", "Expired"] as const;
+export type ProposalStatus = (typeof PROPOSAL_STATUSES)[number];
+
+export interface Proposal {
+  id: string;
+  venture_id: string;
+  client_id: string | null;
+  lead_id: string | null;
+  proposal_number: string;
+  title: string;
+  status: ProposalStatus;
+  issue_date: string;
+  valid_until: string | null;
+  subtotal: number;
+  notes: string | null;
+  terms: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProposalItem {
+  id: string;
+  proposal_id: string;
+  service_name: string;
+  description: string | null;
+  quantity: number;
+  rate: number;
+  amount: number;
+  created_at: string;
+}
+
+// ==================== Projects ====================
+export const PROJECT_STATUSES = ["Planning", "Active", "On Hold", "Completed", "Cancelled"] as const;
+export const MILESTONE_STATUSES = ["Not Started", "In Progress", "Done", "Blocked"] as const;
+
+export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
+export type MilestoneStatus = (typeof MILESTONE_STATUSES)[number];
+
+export interface Project {
+  id: string;
+  venture_id: string;
+  client_id: string | null;
+  lead_id: string | null;
+  proposal_id: string | null;
+  project_name: string;
+  status: ProjectStatus;
+  start_date: string | null;
+  due_date: string | null;
+  budget: number | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProjectMilestone {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  due_date: string | null;
+  status: MilestoneStatus;
+  amount: number | null;
+  created_at: string;
+}
 
 // ==================== Follow-ups ====================
 export const FOLLOWUP_TYPES = ["Call", "Email", "WhatsApp", "Meeting", "Other"] as const;

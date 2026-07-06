@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Groenics - Complete Business Solutions",
+  title: "Groenics - Business Problem Solving Company",
   description:
-    "Groenics helps businesses move from strategy to execution with AI, operations, automation, product development, and growth systems.",
+    "Groenics identifies operational, sales, marketing, customer service, management, and workflow problems, then solves them with AI, automation, and custom software.",
 };
 
 export default function RootLayout({

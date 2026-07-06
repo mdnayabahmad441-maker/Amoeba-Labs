@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { getCurrentUser, signOut } from "@/lib/auth";
+import { PORTAL_ALLOWED_EMAIL } from "@/lib/auth-config";
 import Link from "next/link";
 import Image from "next/image";
 import { User } from "@/lib/types";
@@ -21,6 +22,19 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
   useEffect(() => {
     async function loadUser() {
       const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        router.replace("/auth/login");
+        router.refresh();
+        return;
+      }
+
+      if (currentUser.email !== PORTAL_ALLOWED_EMAIL) {
+        await signOut();
+        router.replace("/auth/login?error=unauthorized");
+        router.refresh();
+        return;
+      }
+
       setUser(currentUser);
       setLoading(false);
     }
@@ -49,8 +63,11 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     { href: "/portal/leads", label: "Leads", icon: "👥" },
     { href: "/portal/followups", label: "Follow-ups", icon: "📞" },
     { href: "/portal/tasks", label: "Tasks", icon: "✅" },
+    { href: "/portal/proposals", label: "Proposals", icon: "📄" },
+    { href: "/portal/projects", label: "Projects", icon: "🧩" },
     { href: "/portal/billing", label: "Billing", icon: "💰" },
     { href: "/portal/ventures", label: "Ventures", icon: "🚀" },
+    { href: "/portal/settings", label: "Settings", icon: "⚙️" },
   ];
 
   const isActive = (href: string) => {

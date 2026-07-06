@@ -168,7 +168,7 @@ export default function Portfolio() {
             },
             {
               title: "Future Venture III",
-              desc: "A third AI-first product targeting a new vertical. Architecture in progress.",
+              desc: "A third product targeting a clear business problem in a new vertical. Architecture in progress.",
               tags: ["Architecture", "Planning"],
             },
           ].map((v, i) => (

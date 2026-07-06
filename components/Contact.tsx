@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 function WhatsAppIcon() {
@@ -16,6 +17,9 @@ function WhatsAppIcon() {
 }
 
 export default function Contact() {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [error, setError] = useState("");
+
   const contactItems = [
     {
       icon: <WhatsAppIcon />,
@@ -28,6 +32,44 @@ export default function Contact() {
     { icon: "24h", label: "Response Time", value: "Within 24 hours", action: "" },
   ];
 
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setStatus("submitting");
+    setError("");
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    const payload = {
+      source: "Website Contact",
+      formspreeEndpoint: "https://formspree.io/f/xeewqrzw",
+      name: String(formData.get("name") || ""),
+      company: String(formData.get("company") || ""),
+      email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
+      message: String(formData.get("message") || ""),
+    };
+
+    try {
+      const response = await fetch("/api/enquiries", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Unable to send enquiry.");
+      }
+
+      form.reset();
+      setStatus("success");
+    } catch (err) {
+      setStatus("error");
+      setError(err instanceof Error ? err.message : "Unable to send enquiry.");
+    }
+  }
+
   return (
     <section id="contact" className="py-28 px-6">
       <div className="max-w-7xl mx-auto">
@@ -39,18 +81,18 @@ export default function Contact() {
             transition={{ duration: 0.7 }}
           >
             <p className="text-amber-300 uppercase tracking-[0.3em] text-xs font-semibold mb-5">
-              Get In Touch
+              Start With The Problem
             </p>
             <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
-              Let&apos;s Build{" "}
+              Get your free{" "}
               <span className="bg-linear-to-r from-amber-200 to-yellow-600 bg-clip-text text-transparent">
-                Together
+                business assessment
               </span>
             </h2>
             <p className="text-gray-400 text-lg leading-relaxed mb-12">
-              Whether you need strategy, execution, automation, software,
-              growth systems, or a complete business buildout, we&apos;d love to
-              start a conversation.
+              Tell us where work feels slow, expensive, manual, confusing, or
+              hard to measure. We&apos;ll help identify the root problems, estimate
+              the opportunity, and outline the first practical solution.
             </p>
 
             <div className="space-y-6">
@@ -118,10 +160,20 @@ export default function Contact() {
           >
             <div className="p-px rounded-3xl bg-linear-to-br from-amber-300/20 via-transparent to-white/5">
               <form
-                action="https://formspree.io/f/xeewqrzw"
-                method="POST"
+                onSubmit={handleSubmit}
                 className="rounded-3xl brand-panel p-8 space-y-5"
               >
+                {status === "success" && (
+                  <div className="rounded-xl border border-green-400/25 bg-green-400/10 px-4 py-3 text-sm text-green-200">
+                    Enquiry saved in the portal. I will get back to you soon.
+                  </div>
+                )}
+                {status === "error" && (
+                  <div className="rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-sm text-red-200">
+                    {error}
+                  </div>
+                )}
+
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-gray-500 uppercase tracking-widest mb-2">
@@ -150,6 +202,18 @@ export default function Contact() {
 
                 <div>
                   <label className="block text-xs text-gray-500 uppercase tracking-widest mb-2">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone / WhatsApp number"
+                    className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-gray-500 uppercase tracking-widest mb-2">
                     Email *
                   </label>
                   <input
@@ -163,12 +227,12 @@ export default function Contact() {
 
                 <div>
                   <label className="block text-xs text-gray-500 uppercase tracking-widest mb-2">
-                    Message *
+                    Business Problem *
                   </label>
                   <textarea
                     rows={5}
                     name="message"
-                    placeholder="Tell us what you want to solve, build, automate, or grow..."
+                    placeholder="Tell us what is slowing the business down, wasting time, leaking revenue, or hurting customers..."
                     required
                     className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all resize-none text-sm"
                   />
@@ -176,9 +240,10 @@ export default function Contact() {
 
                 <button
                   type="submit"
+                  disabled={status === "submitting"}
                   className="w-full py-4 bg-amber-300 hover:bg-amber-200 text-black font-bold rounded-full transition-all duration-300 shadow-lg shadow-amber-900/20 hover:shadow-amber-300/30 hover:scale-[1.01] text-sm"
                 >
-                  Send Message
+                  {status === "submitting" ? "Saving Enquiry..." : "Request Free Assessment"}
                 </button>
               </form>
             </div>

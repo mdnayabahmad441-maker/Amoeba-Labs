@@ -14,6 +14,8 @@ interface Stats {
   activeClients: number;
   totalLeads: number;
   tasksDueToday: number;
+  activeProjects: number;
+  openProposals: number;
 }
 
 interface LeadPipeline {
@@ -29,6 +31,7 @@ export default function DashboardPage() {
   const [pipeline, setPipeline] = useState<LeadPipeline[]>([]);
   const [overdueInvoices, setOverdueInvoices] = useState<(Invoice & { client_name: string })[]>([]);
   const [todayFollowups, setTodayFollowups] = useState<(Followup & { contact_name: string })[]>([]);
+  const [newWebsiteLeads, setNewWebsiteLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -48,13 +51,15 @@ export default function DashboardPage() {
 
       const today = new Date().toISOString().split("T")[0];
 
-      const [clientsRes, leadsRes, invoicesRes, tasksRes, followupsRes] = await Promise.all([
+      const [clientsRes, leadsRes, invoicesRes, tasksRes, followupsRes, proposalsRes, projectsRes] = await Promise.all([
         supabase.from("clients").select("id, status, client_name").eq("venture_id", vId),
         supabase.from("leads").select("*").eq("venture_id", vId).order("created_at", { ascending: false }),
         supabase.from("invoices").select("*").eq("venture_id", vId).order("created_at", { ascending: false }),
         supabase.from("tasks").select("*").eq("venture_id", vId),
         supabase.from("followups").select("*, clients(client_name), leads(client_name)")
           .eq("venture_id", vId).eq("follow_up_date", today).neq("status", "Done"),
+        supabase.from("proposals").select("id, status").eq("venture_id", vId),
+        supabase.from("projects").select("id, status").eq("venture_id", vId),
       ]);
 
       const clientNameMap = new Map((clientsRes.data || []).map((c: any) => [c.id, c.client_name]));
@@ -64,10 +69,29 @@ export default function DashboardPage() {
         ...inv,
         client_name: clientNameMap.get(inv.client_id) || "Unknown Client",
       }));
+      const invoiceIds = invoices.map(i => i.id);
+      let paymentsByInvoice = new Map<string, number>();
+
+      if (invoiceIds.length > 0) {
+        const { data: paymentsData } = await supabase
+          .from("payments")
+          .select("invoice_id, amount")
+          .in("invoice_id", invoiceIds);
+
+        paymentsByInvoice = new Map<string, number>();
+        (paymentsData || []).forEach((payment: any) => {
+          paymentsByInvoice.set(
+            payment.invoice_id,
+            (paymentsByInvoice.get(payment.invoice_id) || 0) + Number(payment.amount || 0)
+          );
+        });
+      }
 
       const leads: Lead[] = leadsRes.data || [];
       const clients = clientsRes.data || [];
       const tasks: Task[] = tasksRes.data || [];
+      const proposals = proposalsRes.data || [];
+      const projects = projectsRes.data || [];
 
       // Today's pending follow-ups
       setTodayFollowups(
@@ -80,14 +104,33 @@ export default function DashboardPage() {
       );
 
       // Stats
+      const collectedAmount = invoices.reduce((sum, invoice) => {
+        const paid = paymentsByInvoice.get(invoice.id);
+        return sum + (paid ?? (invoice.status === "Paid" ? invoice.amount : 0));
+      }, 0);
+      const pendingAmount = invoices
+        .filter(i => i.status !== "Paid" && i.status !== "Cancelled")
+        .reduce((sum, invoice) => {
+          const paid = paymentsByInvoice.get(invoice.id) || 0;
+          return sum + Math.max(invoice.amount - paid, 0);
+        }, 0);
+      const overdueAmount = invoices
+        .filter(i => i.status === "Overdue")
+        .reduce((sum, invoice) => {
+          const paid = paymentsByInvoice.get(invoice.id) || 0;
+          return sum + Math.max(invoice.amount - paid, 0);
+        }, 0);
+
       setStats({
-        totalRevenue: invoices.filter(i => i.status === "Paid").reduce((s, i) => s + i.amount, 0),
-        pendingAmount: invoices.filter(i => i.status === "Sent" || i.status === "Draft").reduce((s, i) => s + i.amount, 0),
-        overdueAmount: invoices.filter(i => i.status === "Overdue").reduce((s, i) => s + i.amount, 0),
+        totalRevenue: collectedAmount,
+        pendingAmount,
+        overdueAmount,
         totalClients: clients.length,
         activeClients: clients.filter(c => c.status === "Active").length,
         totalLeads: leads.length,
         tasksDueToday: tasks.filter(t => t.due_date === today && t.status !== "Done").length,
+        activeProjects: projects.filter((p: any) => p.status === "Active" || p.status === "Planning").length,
+        openProposals: proposals.filter((p: any) => p.status === "Draft" || p.status === "Sent").length,
       });
 
       // Recent paid invoices
@@ -98,6 +141,7 @@ export default function DashboardPage() {
 
       // Recent leads
       setRecentLeads(leads.slice(0, 6));
+      setNewWebsiteLeads(leads.filter(l => l.stage === "New Lead" && (l.source || "").startsWith("Website")).slice(0, 5));
 
       // Pipeline counts
       const stageOrder = ["New Lead", "Contacted", "Demo Scheduled", "Proposal Sent", "Negotiation", "Closed Won", "Closed Lost"];

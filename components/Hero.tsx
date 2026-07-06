@@ -29,9 +29,9 @@ const launchBars = [
 ];
 
 const launchPillars = [
-  "Diagnose",
-  "Systemize",
-  "Scale",
+  "Find",
+  "Build",
+  "Measure",
 ];
 
 export default function Hero() {
@@ -203,7 +203,7 @@ export default function Hero() {
                     Groenics
                   </div>
                   <div className="mt-3 text-xs uppercase tracking-[0.28em] text-amber-200/75">
-                    Operational Excellence Engine
+                    Business Problem Solving
                   </div>
                 </motion.div>
 
@@ -243,7 +243,7 @@ export default function Hero() {
                   transition={{ duration: 0.45, delay: 2.1 }}
                   className="mt-5 flex items-center justify-between rounded-xl border border-amber-300/12 bg-black/30 px-4 py-3 font-mono text-[0.64rem] uppercase tracking-[0.2em] text-stone-400"
                 >
-                  <span>transformation</span>
+                  <span>assessment</span>
                   <span className="text-amber-200/85">ready</span>
                 </motion.div>
               </motion.div>
@@ -360,7 +360,7 @@ export default function Hero() {
               className="mb-8 inline-flex items-center gap-2.5 border border-amber-300/25 bg-amber-300/5 px-5 py-2 rounded-full text-amber-100 text-sm"
             >
               <span className="w-1.5 h-1.5 rounded-full bg-amber-300 animate-pulse" />
-              For businesses that need clarity, systems, and growth
+              We find business problems and build AI solutions
             </motion.div>
 
             <motion.h1
@@ -369,9 +369,9 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.15 }}
               className="text-5xl md:text-6xl xl:text-7xl font-bold leading-[1.02] tracking-tight"
             >
-              Build the systems your
-              <span className="block text-shimmer mt-2">business needs</span>
-              <span className="block text-white">to grow</span>
+              Find the Problems
+              <span className="block text-shimmer mt-2">Slowing Your</span>
+              <span className="block text-white">Business Down.</span>
             </motion.h1>
 
             <motion.p
@@ -380,9 +380,10 @@ export default function Hero() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="mt-8 text-lg text-stone-300 max-w-xl leading-relaxed"
             >
-              Groenics helps businesses turn scattered work into clear
-              strategy, automated operations, better sales follow-up, and
-              software that keeps the company moving.
+              Every business loses money through inefficient processes, manual
+              work, poor follow-ups, and outdated systems. Groenics identifies
+              these problems and solves them with AI, automation, and custom
+              software.
             </motion.p>
 
             <motion.div
@@ -393,18 +394,18 @@ export default function Hero() {
             >
               <a
                 href="#contact"
-                className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-amber-300 hover:bg-amber-200 text-black font-bold rounded-full transition-all duration-300 shadow-lg shadow-amber-900/30 hover:shadow-amber-300/20 hover:scale-[1.02]"
+                className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-amber-300 px-5 py-4 text-center text-sm font-bold text-black shadow-lg shadow-amber-900/30 transition-all duration-300 hover:scale-[1.02] hover:bg-amber-200 hover:shadow-amber-300/20 sm:w-auto sm:px-8 sm:text-base"
               >
-                Start A Project
+                Get a Free Business Assessment
                 <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </a>
               <a
-                href="#portfolio"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-amber-300/20 hover:border-amber-200/45 hover:bg-amber-300/5 rounded-full transition-all duration-300 text-stone-100 font-medium"
+                href="#framework"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-amber-300/20 px-5 py-4 text-sm font-medium text-stone-100 transition-all duration-300 hover:border-amber-200/45 hover:bg-amber-300/5 sm:w-auto sm:px-8 sm:text-base"
               >
-                View What We Build
+                See How We Work
               </a>
             </motion.div>
 
@@ -414,7 +415,7 @@ export default function Hero() {
               transition={{ duration: 1, delay: 0.7 }}
               className="mt-10 flex flex-wrap items-center gap-6 text-sm text-stone-500"
             >
-              {["Revenue Systems", "Operations Dashboards", "AI Automation"].map((item) => (
+              {["Revenue Leaks", "Time Waste", "Manual Workflows"].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-300" />
                   {item}
@@ -429,9 +430,9 @@ export default function Hero() {
               className="mt-8 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3"
             >
               {[
-                { title: "Plan", desc: "Clear roadmap" },
-                { title: "Build", desc: "Tools and workflows" },
-                { title: "Scale", desc: "Automation and reporting" },
+                { title: "Find", desc: "Hidden business problems" },
+                { title: "Build", desc: "AI and software solutions" },
+                { title: "Measure", desc: "Savings and results" },
               ].map((item) => (
                 <div key={item.title} className="rounded-xl border border-amber-300/10 bg-black/20 px-4 py-3">
                   <div className="text-sm font-semibold text-amber-100">{item.title}</div>
