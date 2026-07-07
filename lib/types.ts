@@ -105,6 +105,8 @@ export interface Task {
   priority: "Low" | "Medium" | "High" | "Urgent";
   status: "To Do" | "In Progress" | "Done" | "Cancelled";
   assigned_to: string | null;
+  assigned_to_phone: string | null;
+  assigned_employee_id: string | null;
   related_client_id: string | null;
   related_lead_id: string | null;
   created_at: string;
@@ -118,12 +120,42 @@ export interface CreateTaskInput {
   priority?: "Low" | "Medium" | "High" | "Urgent";
   status?: Task["status"];
   assigned_to?: string;
+  assigned_to_phone?: string;
+  assigned_employee_id?: string;
   related_client_id?: string;
   related_lead_id?: string;
 }
 
 export const TASK_PRIORITIES = ["Low", "Medium", "High", "Urgent"] as const;
 export const TASK_STATUSES = ["To Do", "In Progress", "Done", "Cancelled"] as const;
+
+// ==================== Employees ====================
+export const EMPLOYEE_STATUSES = ["Active", "Inactive"] as const;
+export type EmployeeStatus = (typeof EMPLOYEE_STATUSES)[number];
+
+export interface Employee {
+  id: string;
+  venture_id: string;
+  full_name: string;
+  role: string | null;
+  department: string | null;
+  phone: string | null;
+  email: string | null;
+  status: EmployeeStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateEmployeeInput {
+  full_name: string;
+  role?: string;
+  department?: string;
+  phone?: string;
+  email?: string;
+  status?: EmployeeStatus;
+  notes?: string;
+}
 
 // ==================== Invoices ====================
 export interface Invoice {
@@ -172,6 +204,45 @@ export interface Payment {
 
 export const INVOICE_STATUSES = ["Draft", "Sent", "Partially Paid", "Paid", "Overdue", "Cancelled"] as const;
 export const PAYMENT_METHODS = ["UPI", "Bank Transfer", "Cash", "Card", "Razorpay", "Stripe", "Other"] as const;
+
+// ==================== Expenses ====================
+export const EXPENSE_CATEGORIES = [
+  "Software",
+  "Marketing",
+  "Travel",
+  "Office",
+  "Utilities",
+  "Team",
+  "Client Work",
+  "Food",
+  "Miscellaneous",
+] as const;
+
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+
+export interface Expense {
+  id: string;
+  venture_id: string;
+  expense_date: string;
+  category: ExpenseCategory;
+  amount: number;
+  payment_method: Payment["method"];
+  vendor: string | null;
+  paid_by: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateExpenseInput {
+  expense_date: string;
+  category: ExpenseCategory;
+  amount: number;
+  payment_method: Payment["method"];
+  vendor?: string;
+  paid_by?: string;
+  notes?: string;
+}
 
 // ==================== Business Settings ====================
 export interface BusinessSettings {

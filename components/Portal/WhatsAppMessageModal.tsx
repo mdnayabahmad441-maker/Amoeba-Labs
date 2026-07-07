@@ -14,9 +14,17 @@ interface WhatsAppMessageModalProps {
   phone?: string | null;
   clientId?: string;
   leadId?: string;
+  defaultMessageType?: string;
+  initialMessage?: string;
 }
 
 const messageTypes = [
+  {
+    value: "task",
+    label: "Task Handover",
+    template:
+      "Hi {{name}}, this is Nayab from Groenics. I am handing over a task to you. Please check the details and update me once it is done.",
+  },
   {
     value: "followup",
     label: "Follow-up",
@@ -71,9 +79,12 @@ export default function WhatsAppMessageModal({
   phone,
   clientId,
   leadId,
+  defaultMessageType = "followup",
+  initialMessage,
 }: WhatsAppMessageModalProps) {
-  const [messageType, setMessageType] = useState("followup");
-  const [message, setMessage] = useState(personalize(messageTypes[0].template, contactName));
+  const defaultType = messageTypes.find((type) => type.value === defaultMessageType) || messageTypes[0];
+  const [messageType, setMessageType] = useState(defaultType.value);
+  const [message, setMessage] = useState(initialMessage || personalize(defaultType.template, contactName));
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -81,11 +92,16 @@ export default function WhatsAppMessageModal({
   useEffect(() => {
     if (!isOpen) return;
 
-    setMessageType("followup");
-    setMessage(personalize(messageTypes[0].template, contactName));
-    setError("");
-    setSuccess("");
-  }, [contactName, isOpen]);
+    const timer = window.setTimeout(() => {
+      const selected = messageTypes.find((type) => type.value === defaultMessageType) || messageTypes[0];
+      setMessageType(selected.value);
+      setMessage(initialMessage || personalize(selected.template, contactName));
+      setError("");
+      setSuccess("");
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [contactName, defaultMessageType, initialMessage, isOpen]);
 
   function handleTypeChange(value: string) {
     setMessageType(value);

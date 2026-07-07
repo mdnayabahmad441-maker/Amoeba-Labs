@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Task, CreateTaskInput, TASK_PRIORITIES, TASK_STATUSES } from "@/lib/types";
+import { Employee, Task, CreateTaskInput, TASK_PRIORITIES, TASK_STATUSES } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
-import { LoadingState, ErrorState, EmptyState } from "@/components/Portal/States";
+import { LoadingState, EmptyState } from "@/components/Portal/States";
 import DataTable from "@/components/Portal/DataTable";
+import WhatsAppMessageModal from "@/components/Portal/WhatsAppMessageModal";
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [filterPriority, setFilterPriority] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
+  const [messageTask, setMessageTask] = useState<Task | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [ventureId, setVentureId] = useState<string>("");
+  const [notifyOnSave, setNotifyOnSave] = useState(false);
 
   const [formData, setFormData] = useState<CreateTaskInput>({
     title: "",
@@ -25,14 +29,12 @@ export default function TasksPage() {
     due_date: "",
     priority: "Medium",
     status: "To Do",
+    assigned_employee_id: "",
     assigned_to: "",
+    assigned_to_phone: "",
   });
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -51,7 +53,6 @@ export default function TasksPage() {
       const vId = ventures[0].id;
       setVentureId(vId);
 
-      // Load tasks
       let query = supabase.from("tasks").select("*").eq("venture_id", vId);
 
       if (filterStatus) {
@@ -62,16 +63,41 @@ export default function TasksPage() {
         query = query.eq("priority", filterPriority);
       }
 
-      const { data, error: err } = await query.order("due_date", { ascending: true });
+      const [tasksRes, employeesRes] = await Promise.all([
+        query.order("due_date", { ascending: true }),
+        supabase
+          .from("employees")
+          .select("*")
+          .eq("venture_id", vId)
+          .eq("status", "Active")
+          .order("full_name", { ascending: true }),
+      ]);
 
-      if (err) throw err;
-      setTasks(data || []);
-    } catch (err: any) {
-      setError(err.message);
+      if (tasksRes.error) throw tasksRes.error;
+      setTasks((tasksRes.data as Task[]) || []);
+
+      if (employeesRes.error) {
+        setEmployees([]);
+        if (String(employeesRes.error.message || "").includes("employees")) {
+          setError("Run EMPLOYEES_UPGRADE.sql in Supabase SQL Editor to assign tasks from the employee list.");
+        }
+      } else {
+        setEmployees((employeesRes.data as Employee[]) || []);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to load tasks.");
     } finally {
       setLoading(false);
     }
-  }
+  }, [filterPriority, filterStatus]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      loadData();
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [loadData]);
 
   const handleAddTask = () => {
     setFormData({
@@ -80,9 +106,12 @@ export default function TasksPage() {
       due_date: "",
       priority: "Medium",
       status: "To Do",
+      assigned_employee_id: "",
       assigned_to: "",
+      assigned_to_phone: "",
     });
     setEditingId(null);
+    setNotifyOnSave(false);
     setShowModal(true);
   };
 
@@ -93,11 +122,14 @@ export default function TasksPage() {
       due_date: task.due_date,
       priority: task.priority,
       status: task.status,
+      assigned_employee_id: task.assigned_employee_id || undefined,
       assigned_to: task.assigned_to || undefined,
+      assigned_to_phone: task.assigned_to_phone || undefined,
       related_client_id: task.related_client_id || undefined,
       related_lead_id: task.related_lead_id || undefined,
     });
     setEditingId(task.id);
+    setNotifyOnSave(false);
     setShowModal(true);
   };
 
@@ -106,33 +138,79 @@ export default function TasksPage() {
     setSubmitting(true);
 
     try {
+      const payload = {
+        ...formData,
+        assigned_employee_id: formData.assigned_employee_id || null,
+        assigned_to: formData.assigned_to?.trim() || null,
+        assigned_to_phone: formData.assigned_to_phone?.trim() || null,
+      };
+      let savedTask: Task | null = null;
+
       if (editingId) {
-        // Update
-        const { error: err } = await supabase
+        const { data, error: err } = await supabase
           .from("tasks")
-          .update(formData)
-          .eq("id", editingId);
+          .update(payload)
+          .eq("id", editingId)
+          .select("*")
+          .single();
 
         if (err) throw err;
+        savedTask = data as Task;
       } else {
-        // Create
-        const { error: err } = await supabase.from("tasks").insert([
+        const { data, error: err } = await supabase.from("tasks").insert([
           {
-            ...formData,
+            ...payload,
             venture_id: ventureId,
           },
-        ]);
+        ]).select("*").single();
 
         if (err) throw err;
+        savedTask = data as Task;
       }
 
       setShowModal(false);
-      loadData();
-    } catch (err: any) {
-      setError(err.message);
+      await loadData();
+
+      if (notifyOnSave && savedTask) {
+        if (savedTask.assigned_to_phone) {
+          setMessageTask(savedTask);
+        } else {
+          setError("Task saved, but no WhatsApp number was added for notification.");
+        }
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to save task.");
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function taskNotificationMessage(task: Task) {
+    const dueDate = task.due_date ? new Date(task.due_date).toLocaleDateString("en-IN") : "Not set";
+    const description = task.description ? `\n\nDetails: ${task.description}` : "";
+
+    return [
+      `Hi ${task.assigned_to || "there"}, this is Nayab from Groenics.`,
+      "",
+      "I am handing over this task to you:",
+      `Task: ${task.title}`,
+      `Due date: ${dueDate}`,
+      `Priority: ${task.priority}`,
+      `Status: ${task.status}${description}`,
+      "",
+      "Please confirm once you have seen this.",
+    ].join("\n");
+  }
+
+  function handleEmployeePick(employeeId: string) {
+    const employee = employees.find((item) => item.id === employeeId);
+
+    setFormData({
+      ...formData,
+      assigned_employee_id: employeeId || undefined,
+      assigned_to: employee?.full_name || formData.assigned_to || "",
+      assigned_to_phone: employee?.phone || formData.assigned_to_phone || "",
+    });
   }
 
   async function handleDelete(id: string) {
@@ -142,22 +220,8 @@ export default function TasksPage() {
       const { error: err } = await supabase.from("tasks").delete().eq("id", id);
       if (err) throw err;
       loadData();
-    } catch (err: any) {
-      setError(err.message);
-    }
-  }
-
-  async function updateStatus(id: string, newStatus: Task["status"]) {
-    try {
-      const { error: err } = await supabase
-        .from("tasks")
-        .update({ status: newStatus })
-        .eq("id", id);
-
-      if (err) throw err;
-      loadData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unable to delete task.");
     }
   }
 
@@ -286,12 +350,30 @@ export default function TasksPage() {
             },
             {
               key: "assigned_to",
-              label: "Assigned To",
+              label: "Handed Over To",
+              render: (value) => value || "-",
+            },
+            {
+              key: "assigned_employee_id",
+              label: "Employee",
+              render: (value) => employees.find((employee) => employee.id === value)?.full_name || "-",
+            },
+            {
+              key: "assigned_to_phone",
+              label: "WhatsApp",
               render: (value) => value || "-",
             },
           ]}
           actions={(task) => (
             <div className="flex flex-wrap gap-2">
+              {task.assigned_to_phone && (
+                <button
+                  onClick={() => setMessageTask(task)}
+                  className="text-xs px-2 py-1 bg-green-500/20 text-green-300 rounded hover:bg-green-500/30 transition"
+                >
+                  WhatsApp
+                </button>
+              )}
               <button
                 onClick={() => handleEditTask(task)}
                 className="text-xs px-2 py-1 bg-amber-300/20 text-amber-200 rounded hover:bg-amber-300/30 transition"
@@ -353,7 +435,7 @@ export default function TasksPage() {
             onChange={(e) =>
               setFormData({
                 ...formData,
-                priority: e.target.value as any,
+                priority: e.target.value as Task["priority"],
               })
             }
             options={TASK_PRIORITIES.map((p) => ({ value: p, label: p }))}
@@ -365,21 +447,57 @@ export default function TasksPage() {
             onChange={(e) =>
               setFormData({
                 ...formData,
-                status: e.target.value as any,
+                status: e.target.value as Task["status"],
               })
             }
             options={TASK_STATUSES.map((s) => ({ value: s, label: s }))}
           />
 
+          <FormSelect
+            label="Assign Employee"
+            value={formData.assigned_employee_id || ""}
+            onChange={(e) => handleEmployeePick(e.target.value)}
+            placeholder={employees.length ? "Select employee" : "No employees added"}
+            options={employees.map((employee) => ({
+              value: employee.id,
+              label: `${employee.full_name}${employee.role ? ` - ${employee.role}` : ""}`,
+            }))}
+          />
+
           <FormInput
-            label="Assigned To"
+            label="Hand Over To"
             type="text"
             value={formData.assigned_to || ""}
             onChange={(e) =>
               setFormData({ ...formData, assigned_to: e.target.value })
             }
-            placeholder="Enter person/team name"
+            placeholder="Enter person or team name"
           />
+
+          <FormInput
+            label="WhatsApp Number"
+            type="tel"
+            value={formData.assigned_to_phone || ""}
+            onChange={(e) =>
+              setFormData({ ...formData, assigned_to_phone: e.target.value })
+            }
+            placeholder="Enter handover WhatsApp number"
+          />
+
+          <label className="flex items-start gap-3 rounded-xl border border-green-500/20 bg-green-500/10 p-3">
+            <input
+              type="checkbox"
+              checked={notifyOnSave}
+              onChange={(e) => setNotifyOnSave(e.target.checked)}
+              className="mt-1 h-4 w-4 rounded border-green-500/40 bg-black/20 accent-green-400"
+            />
+            <span>
+              <span className="block text-sm font-semibold text-green-300">Open WhatsApp notification after saving</span>
+              <span className="mt-1 block text-xs leading-relaxed text-green-200/70">
+                The task handover message will open with the task title, due date, priority, and description filled in.
+              </span>
+            </span>
+          </label>
 
           <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button
@@ -399,6 +517,18 @@ export default function TasksPage() {
           </div>
         </form>
       </Modal>
+
+      {messageTask && (
+        <WhatsAppMessageModal
+          isOpen={!!messageTask}
+          onClose={() => setMessageTask(null)}
+          ventureId={ventureId}
+          contactName={messageTask.assigned_to || "Task owner"}
+          phone={messageTask.assigned_to_phone}
+          defaultMessageType="task"
+          initialMessage={taskNotificationMessage(messageTask)}
+        />
+      )}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
       setLoading(false);
     }
     loadUser();
-  }, []);
+  }, [router]);
 
   async function handleLogout() {
     const result = await signOut();
@@ -62,10 +62,12 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     { href: "/portal/clients", label: "Clients", icon: "🏢" },
     { href: "/portal/leads", label: "Leads", icon: "👥" },
     { href: "/portal/followups", label: "Follow-ups", icon: "📞" },
+    { href: "/portal/employees", label: "Employees", icon: "Team" },
     { href: "/portal/tasks", label: "Tasks", icon: "✅" },
     { href: "/portal/proposals", label: "Proposals", icon: "📄" },
     { href: "/portal/projects", label: "Projects", icon: "🧩" },
     { href: "/portal/billing", label: "Billing", icon: "💰" },
+    { href: "/portal/expenses", label: "Expenses", icon: "Rs" },
     { href: "/portal/ventures", label: "Ventures", icon: "🚀" },
     { href: "/portal/settings", label: "Settings", icon: "⚙️" },
   ];
