@@ -41,6 +41,16 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     loadUser();
   }, [router]);
 
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const syncSidebar = () => setSidebarOpen(mediaQuery.matches);
+
+    syncSidebar();
+    mediaQuery.addEventListener("change", syncSidebar);
+
+    return () => mediaQuery.removeEventListener("change", syncSidebar);
+  }, []);
+
   async function handleLogout() {
     const result = await signOut();
     if (result.success) {
@@ -98,14 +108,14 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-[#0b0a08] border-r border-amber-300/10 transition-all duration-300 z-40 ${
+        className={`fixed left-0 top-0 z-40 flex h-full flex-col overflow-hidden bg-[#0b0a08] border-r border-amber-300/10 transition-all duration-300 ${
           sidebarOpen
             ? "w-72 translate-x-0 md:w-64"
             : "w-72 -translate-x-full md:w-20 md:translate-x-0"
         }`}
       >
         {/* Logo */}
-        <div className="p-4 sm:p-6 border-b border-amber-300/10 flex items-center justify-between">
+        <div className="flex shrink-0 items-center justify-between border-b border-amber-300/10 p-4 sm:p-6">
           <div className="flex items-center gap-3 min-w-0">
             <Image
               src="/groenics-logo.jpeg"
@@ -127,7 +137,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 sm:p-4 space-y-2">
+        <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3 pb-4 sm:p-4">
           {navItems.map((item) => (
             <Link
               key={item.href}
@@ -147,7 +157,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
         </nav>
 
         {/* Logout */}
-        <div className="absolute bottom-6 left-0 right-0 px-4">
+        <div className="shrink-0 border-t border-amber-300/10 bg-[#0b0a08] p-3 sm:p-4">
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 bg-red-500/10 border border-red-500/50 text-red-400 rounded-lg hover:bg-red-500/20 transition"
