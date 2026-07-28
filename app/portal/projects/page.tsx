@@ -9,6 +9,7 @@ import {
   MilestoneStatus,
   Project,
   ProjectMilestone,
+  ProjectProfitability,
   PROJECT_STATUSES,
   ProjectStatus,
   Proposal,
@@ -16,12 +17,14 @@ import {
 import Modal from "@/components/Portal/Modal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { LoadingState, EmptyState } from "@/components/Portal/States";
+import ActivityTimelineModal from "@/components/Portal/ActivityTimelineModal";
 
 type ProjectRow = Project & {
   milestones: ProjectMilestone[];
   client_name?: string;
   lead_name?: string;
   proposal_number?: string;
+  profitability?: ProjectProfitability;
 };
 
 type ProjectForm = {
@@ -34,6 +37,18 @@ type ProjectForm = {
   due_date: string;
   budget: number;
   notes: string;
+  agreement_required: boolean;
+  agreement_status: Project["agreement_status"];
+  deposit_required: boolean;
+  deposit_amount: number;
+  deposit_received: boolean;
+  requirements_received: boolean;
+  onboarding_completed: boolean;
+  recognized_revenue: number;
+  profitability_basis: Project["profitability_basis"];
+  direct_cost_budget: number;
+  estimated_hours: number;
+  actual_hours: number;
 };
 
 type MilestoneForm = {
@@ -49,11 +64,23 @@ const emptyProject: ProjectForm = {
   lead_id: "",
   proposal_id: "",
   project_name: "",
-  status: "Planning",
+  status: "Awaiting Requirements",
   start_date: "",
   due_date: "",
   budget: 0,
   notes: "",
+  agreement_required: false,
+  agreement_status: "Not required",
+  deposit_required: false,
+  deposit_amount: 0,
+  deposit_received: false,
+  requirements_received: false,
+  onboarding_completed: false,
+  recognized_revenue: 0,
+  profitability_basis: "Collected",
+  direct_cost_budget: 0,
+  estimated_hours: 0,
+  actual_hours: 0,
 };
 
 const emptyMilestone: MilestoneForm = {
@@ -80,6 +107,9 @@ export default function ProjectsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [milestoneProject, setMilestoneProject] = useState<ProjectRow | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [timelineProject, setTimelineProject] = useState<ProjectRow | null>(null);
+  const [costProject, setCostProject] = useState<ProjectRow | null>(null);
+  const [costForm, setCostForm] = useState({ direct_cost_type: "Contractor", amount: 0, expense_date: "", vendor: "", notes: "" });
   const [projectForm, setProjectForm] = useState<ProjectForm>(emptyProject);
   const [milestoneForm, setMilestoneForm] = useState<MilestoneForm>(emptyMilestone);
 
@@ -97,7 +127,7 @@ export default function ProjectsPage() {
       setLoading(true);
       setError("");
 
-      const { data: ventures } = await supabase.from("ventures").select("id").eq("status", "Active").limit(1);
+      const { data: ventures } = await supabase.from("ventures").select("id").eq("status", "Active").is("archived_at", null).order("is_default", { ascending: false }).order("created_at", { ascending: true }).limit(1);
       if (!ventures || ventures.length === 0) {
         setError("No active venture found.");
         return;
@@ -107,10 +137,10 @@ export default function ProjectsPage() {
       setVentureId(activeVentureId);
 
       const [clientsRes, leadsRes, proposalsRes, projectsRes] = await Promise.all([
-        supabase.from("clients").select("*").eq("venture_id", activeVentureId).order("client_name"),
-        supabase.from("leads").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
-        supabase.from("proposals").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
-        supabase.from("projects").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
+        supabase.from("clients").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("client_name"),
+        supabase.from("leads").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
+        supabase.from("proposals").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
+        supabase.from("projects").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
       ]);
 
       if (clientsRes.error) throw clientsRes.error;
@@ -120,11 +150,15 @@ export default function ProjectsPage() {
 
       const projectRows = (projectsRes.data || []) as Project[];
       const projectIds = projectRows.map((project) => project.id);
-      const milestoneRes = projectIds.length
-        ? await supabase.from("project_milestones").select("*").in("project_id", projectIds).order("due_date", { ascending: true })
-        : { data: [], error: null };
+      const [milestoneRes, profitabilityRes] = projectIds.length
+        ? await Promise.all([
+            supabase.from("project_milestones").select("*").in("project_id", projectIds).order("due_date", { ascending: true }),
+            supabase.from("project_profitability").select("*").in("project_id", projectIds),
+          ])
+        : [{ data: [], error: null }, { data: [], error: null }];
 
       if (milestoneRes.error) throw milestoneRes.error;
+      if (profitabilityRes.error && !profitabilityRes.error.message.includes("project_profitability")) throw profitabilityRes.error;
 
       const clientRows = (clientsRes.data || []) as Client[];
       const leadRows = (leadsRes.data || []) as Lead[];
@@ -133,6 +167,7 @@ export default function ProjectsPage() {
       const leadMap = new Map(leadRows.map((lead) => [lead.id, lead.client_name]));
       const proposalMap = new Map(proposalRows.map((proposal) => [proposal.id, proposal.proposal_number]));
       const milestoneMap = new Map<string, ProjectMilestone[]>();
+      const profitabilityMap = new Map(((profitabilityRes.data || []) as ProjectProfitability[]).map((row) => [row.project_id, row]));
 
       ((milestoneRes.data || []) as ProjectMilestone[]).forEach((milestone) => {
         milestoneMap.set(milestone.project_id, [...(milestoneMap.get(milestone.project_id) || []), milestone]);
@@ -148,10 +183,11 @@ export default function ProjectsPage() {
           client_name: project.client_id ? clientMap.get(project.client_id) : undefined,
           lead_name: project.lead_id ? leadMap.get(project.lead_id) : undefined,
           proposal_number: project.proposal_id ? proposalMap.get(project.proposal_id) : undefined,
+          profitability: profitabilityMap.get(project.id),
         }))
       );
-    } catch (err: any) {
-      setError(err.message || "Unable to load projects.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to load projects.");
     } finally {
       setLoading(false);
     }
@@ -174,6 +210,18 @@ export default function ProjectsPage() {
       due_date: project.due_date || "",
       budget: Number(project.budget || 0),
       notes: project.notes || "",
+      agreement_required: project.agreement_required ?? false,
+      agreement_status: project.agreement_status || "Not required",
+      deposit_required: project.deposit_required ?? false,
+      deposit_amount: Number(project.deposit_amount || 0),
+      deposit_received: project.deposit_received ?? false,
+      requirements_received: project.requirements_received ?? false,
+      onboarding_completed: project.onboarding_completed ?? false,
+      recognized_revenue: Number(project.recognized_revenue || 0),
+      profitability_basis: project.profitability_basis || "Collected",
+      direct_cost_budget: Number(project.direct_cost_budget || 0),
+      estimated_hours: Number(project.estimated_hours || 0),
+      actual_hours: Number(project.actual_hours || 0),
     });
     setEditingId(project.id);
     setShowProjectModal(true);
@@ -196,6 +244,18 @@ export default function ProjectsPage() {
         due_date: projectForm.due_date || null,
         budget: projectForm.budget || 0,
         notes: projectForm.notes || null,
+        agreement_required: projectForm.agreement_required,
+        agreement_status: projectForm.agreement_required ? projectForm.agreement_status : "Not required",
+        deposit_required: projectForm.deposit_required,
+        deposit_amount: projectForm.deposit_required ? projectForm.deposit_amount : 0,
+        deposit_received: projectForm.deposit_required ? projectForm.deposit_received : false,
+        requirements_received: projectForm.requirements_received,
+        onboarding_completed: projectForm.onboarding_completed,
+        recognized_revenue: projectForm.recognized_revenue,
+        profitability_basis: projectForm.profitability_basis,
+        direct_cost_budget: projectForm.direct_cost_budget,
+        estimated_hours: projectForm.estimated_hours,
+        actual_hours: projectForm.actual_hours,
         updated_at: new Date().toISOString(),
       };
 
@@ -207,8 +267,8 @@ export default function ProjectsPage() {
 
       setShowProjectModal(false);
       await loadData();
-    } catch (err: any) {
-      setError(err.message || "Unable to save project.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save project.");
     } finally {
       setSubmitting(false);
     }
@@ -243,8 +303,8 @@ export default function ProjectsPage() {
       setShowMilestoneModal(false);
       setMilestoneProject(null);
       await loadData();
-    } catch (err: any) {
-      setError(err.message || "Unable to save milestone.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save milestone.");
     } finally {
       setSubmitting(false);
     }
@@ -260,13 +320,62 @@ export default function ProjectsPage() {
   }
 
   async function deleteProject(id: string) {
-    if (!confirm("Delete this project?")) return;
-    const { error: deleteError } = await supabase.from("projects").delete().eq("id", id);
+    if (!confirm("Archive this project? Its delivery and milestone history will be retained.")) return;
+    const { error: deleteError } = await supabase.from("projects").update({ archived_at: new Date().toISOString() }).eq("id", id);
     if (deleteError) {
       setError(deleteError.message);
       return;
     }
     loadData();
+  }
+
+  async function overrideProjectStart(project: ProjectRow) {
+    const reason = window.prompt("Why should this project start before all required gates are complete?");
+    if (!reason?.trim()) return;
+    const { error: overrideError } = await supabase.rpc("activate_project_with_override", {
+      target_project: project.id,
+      override_reason: reason.trim(),
+    });
+    if (overrideError) {
+      setError(overrideError.message);
+      return;
+    }
+    await loadData();
+  }
+
+  function openDirectCost(project: ProjectRow) {
+    setCostProject(project);
+    setCostForm({ direct_cost_type: "Contractor", amount: 0, expense_date: new Date().toISOString().slice(0, 10), vendor: "", notes: "" });
+  }
+
+  async function saveDirectCost(event: React.FormEvent) {
+    event.preventDefault();
+    if (!costProject || costForm.amount <= 0) return;
+    setSubmitting(true);
+    const { error: costError } = await supabase.from("expenses").insert([{
+      venture_id: costProject.venture_id,
+      project_id: costProject.id,
+      direct_cost_type: costForm.direct_cost_type,
+      category: costForm.direct_cost_type === "Travel" ? "Travel" : ["Software", "API"].includes(costForm.direct_cost_type) ? "Software" : "Client Work",
+      amount: costForm.amount,
+      expense_date: costForm.expense_date,
+      payment_method: "Bank Transfer",
+      vendor: costForm.vendor.trim() || null,
+      notes: costForm.notes.trim() || null,
+    }]);
+    setSubmitting(false);
+    if (costError) { setError(costError.message); return; }
+    setCostProject(null);
+    await loadData();
+  }
+
+  function startBlockers(project: ProjectRow) {
+    const blockers: string[] = [];
+    if (project.agreement_required && project.agreement_status !== "Accepted") blockers.push("Agreement");
+    if (project.deposit_required && !project.deposit_received) blockers.push("Deposit");
+    if (!project.requirements_received) blockers.push("Requirements");
+    if (!project.onboarding_completed) blockers.push("Onboarding");
+    return blockers;
   }
 
   function progress(project: ProjectRow) {
@@ -337,6 +446,35 @@ export default function ProjectsPage() {
                 </div>
               </div>
 
+              <div className={`mt-4 rounded-xl border p-3 ${project.ready_to_start_status === "Ready" ? "border-green-500/20 bg-green-500/10" : project.ready_to_start_status === "Overridden" ? "border-orange-500/20 bg-orange-500/10" : "border-red-500/20 bg-red-500/10"}`}>
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-sm font-semibold text-white">Start readiness: {project.ready_to_start_status}</p>
+                  {project.ready_to_start_status === "Blocked" && <button onClick={() => overrideProjectStart(project)} className="rounded bg-orange-500/15 px-2 py-1 text-xs font-semibold text-orange-200">Founder override</button>}
+                </div>
+                {startBlockers(project).length > 0 ? <p className="mt-1 text-xs text-red-200">Blocked by: {startBlockers(project).join(", ")}</p> : <p className="mt-1 text-xs text-green-300">All commercial and onboarding gates are complete.</p>}
+                {project.start_override_reason && <p className="mt-1 text-xs text-orange-200">Override reason: {project.start_override_reason}</p>}
+              </div>
+
+              {project.profitability ? (
+                <div className="mt-4 rounded-xl border border-sky-500/20 bg-sky-500/5 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div><p className="text-sm font-semibold text-white">Project profitability</p><p className="text-[11px] text-gray-500">Gross profit uses {project.profitability.profitability_basis.toLowerCase()} revenue.</p></div>
+                    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${project.profitability.profitability_health === "Healthy" ? "bg-green-500/15 text-green-300" : project.profitability.profitability_health === "Low margin" ? "bg-yellow-500/15 text-yellow-300" : "bg-red-500/15 text-red-300"}`}>{project.profitability.profitability_health}</span>
+                  </div>
+                  <div className="mt-3 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
+                    <div><p className="text-gray-500">Invoiced</p><p className="font-semibold text-white">{money(project.profitability.invoiced_amount)}</p></div>
+                    <div><p className="text-gray-500">Collected</p><p className="font-semibold text-green-300">{money(project.profitability.collected_amount)}</p></div>
+                    <div><p className="text-gray-500">Direct costs</p><p className="font-semibold text-red-300">{money(project.profitability.direct_costs)}</p></div>
+                    <div><p className="text-gray-500">Gross profit</p><p className="font-semibold text-amber-200">{money(project.profitability.gross_profit)}</p></div>
+                    <div><p className="text-gray-500">Gross margin</p><p className="font-semibold text-white">{project.profitability.gross_margin === null ? "Not available" : `${project.profitability.gross_margin}%`}</p></div>
+                    <div><p className="text-gray-500">Outstanding</p><p className="font-semibold text-orange-200">{money(project.profitability.outstanding_amount)}</p></div>
+                    <div><p className="text-gray-500">Cost variance</p><p className="font-semibold text-white">{money(project.profitability.budget_variance)}</p></div>
+                    <div><p className="text-gray-500">Revenue/hour</p><p className="font-semibold text-white">{project.profitability.effective_revenue_per_hour === null ? "Add hours" : money(project.profitability.effective_revenue_per_hour)}</p></div>
+                  </div>
+                  <details className="mt-3 text-xs text-gray-400"><summary className="cursor-pointer text-sky-300">Cost breakdown</summary><p className="mt-2">Contractor {money(project.profitability.contractor_cost)} · Employee {money(project.profitability.employee_cost)} · Software {money(project.profitability.software_cost)} · API {money(project.profitability.api_cost)} · Travel {money(project.profitability.travel_cost)} · Other {money(project.profitability.other_cost)}</p></details>
+                </div>
+              ) : <p className="mt-4 rounded-xl border border-sky-500/15 bg-sky-500/5 p-3 text-xs text-sky-200">Apply the Phase 11 migration to calculate project profitability.</p>}
+
               <div className="mt-4 space-y-2">
                 {project.milestones.length === 0 ? (
                   <p className="text-sm text-gray-500">No milestones yet.</p>
@@ -359,6 +497,12 @@ export default function ProjectsPage() {
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">
+                <button onClick={() => setTimelineProject(project)} className="rounded bg-amber-300/10 px-3 py-2 text-xs text-amber-200 hover:bg-amber-300/20">
+                  Timeline
+                </button>
+                <button onClick={() => openDirectCost(project)} className="rounded bg-red-500/10 px-3 py-2 text-xs text-red-200 hover:bg-red-500/20">
+                  + Direct cost
+                </button>
                 <button onClick={() => openMilestone(project)} className="rounded bg-sky-500/15 px-3 py-2 text-xs text-sky-300 hover:bg-sky-500/25">
                   + Milestone
                 </button>
@@ -366,13 +510,15 @@ export default function ProjectsPage() {
                   Edit
                 </button>
                 <button onClick={() => deleteProject(project.id)} className="rounded bg-red-500/15 px-3 py-2 text-xs text-red-300 hover:bg-red-500/25">
-                  Delete
+                  Archive
                 </button>
               </div>
             </div>
           ))}
         </div>
       )}
+
+      {timelineProject && <ActivityTimelineModal isOpen={Boolean(timelineProject)} onClose={() => setTimelineProject(null)} ventureId={timelineProject.venture_id} recordType="Project" recordId={timelineProject.id} recordName={timelineProject.project_name} />}
 
       <Modal isOpen={showProjectModal} onClose={() => setShowProjectModal(false)} title={editingId ? "Edit Project" : "Add Project"}>
         <form onSubmit={saveProject} className="space-y-4">
@@ -403,7 +549,29 @@ export default function ProjectsPage() {
             <FormInput label="Start Date" type="date" value={projectForm.start_date} onChange={(e) => setProjectForm({ ...projectForm, start_date: e.target.value })} />
             <FormInput label="Due Date" type="date" value={projectForm.due_date} onChange={(e) => setProjectForm({ ...projectForm, due_date: e.target.value })} />
           </div>
+          <section className="space-y-4 rounded-xl border border-amber-300/15 bg-amber-300/5 p-4">
+            <div><h3 className="font-semibold text-amber-200">Commercial and onboarding gates</h3><p className="text-xs text-gray-500">The database prevents Active status until every required gate is complete.</p></div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="flex items-center gap-3 rounded-lg border border-white/10 p-3 text-sm text-gray-300"><input type="checkbox" checked={projectForm.agreement_required} onChange={(e) => setProjectForm({ ...projectForm, agreement_required: e.target.checked, agreement_status: e.target.checked ? "Pending" : "Not required" })} className="accent-amber-300" />Agreement required</label>
+              {projectForm.agreement_required && <FormSelect label="Agreement status" value={projectForm.agreement_status} onChange={(e) => setProjectForm({ ...projectForm, agreement_status: e.target.value as Project["agreement_status"] })} options={["Pending","Accepted"].map((value) => ({ value, label: value }))} />}
+              <label className="flex items-center gap-3 rounded-lg border border-white/10 p-3 text-sm text-gray-300"><input type="checkbox" checked={projectForm.deposit_required} onChange={(e) => setProjectForm({ ...projectForm, deposit_required: e.target.checked })} className="accent-amber-300" />Deposit required</label>
+              {projectForm.deposit_required && <FormInput label="Deposit amount" type="number" min="0" value={projectForm.deposit_amount} onChange={(e) => setProjectForm({ ...projectForm, deposit_amount: Number(e.target.value) })} />}
+              {projectForm.deposit_required && <label className="flex items-center gap-3 rounded-lg border border-white/10 p-3 text-sm text-gray-300"><input type="checkbox" checked={projectForm.deposit_received} onChange={(e) => setProjectForm({ ...projectForm, deposit_received: e.target.checked })} className="accent-green-400" />Deposit received</label>}
+              <label className="flex items-center gap-3 rounded-lg border border-white/10 p-3 text-sm text-gray-300"><input type="checkbox" checked={projectForm.requirements_received} onChange={(e) => setProjectForm({ ...projectForm, requirements_received: e.target.checked })} className="accent-green-400" />Requirements received</label>
+              <label className="flex items-center gap-3 rounded-lg border border-white/10 p-3 text-sm text-gray-300"><input type="checkbox" checked={projectForm.onboarding_completed} onChange={(e) => setProjectForm({ ...projectForm, onboarding_completed: e.target.checked })} className="accent-green-400" />Onboarding completed</label>
+            </div>
+          </section>
           <FormInput label="Budget" type="number" min="0" step="0.01" value={projectForm.budget} onChange={(e) => setProjectForm({ ...projectForm, budget: Number(e.target.value) })} />
+          <section className="space-y-4 rounded-xl border border-sky-500/15 bg-sky-500/5 p-4">
+            <div><h3 className="font-semibold text-sky-200">Profitability settings</h3><p className="text-xs text-gray-500">Choose the revenue basis explicitly. Collected revenue is the safest cash view; recognized revenue must be entered deliberately.</p></div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormSelect label="Gross-profit revenue basis" value={projectForm.profitability_basis} onChange={(e) => setProjectForm({ ...projectForm, profitability_basis: e.target.value as Project["profitability_basis"] })} options={["Collected","Invoiced","Recognized"].map((value) => ({ value, label: `${value} revenue` }))} />
+              <FormInput label="Recognized revenue" type="number" min="0" step="0.01" value={projectForm.recognized_revenue} onChange={(e) => setProjectForm({ ...projectForm, recognized_revenue: Number(e.target.value) })} />
+              <FormInput label="Direct-cost budget" type="number" min="0" step="0.01" value={projectForm.direct_cost_budget} onChange={(e) => setProjectForm({ ...projectForm, direct_cost_budget: Number(e.target.value) })} />
+              <FormInput label="Estimated hours" type="number" min="0" step="0.25" value={projectForm.estimated_hours} onChange={(e) => setProjectForm({ ...projectForm, estimated_hours: Number(e.target.value) })} />
+              <FormInput label="Actual hours" type="number" min="0" step="0.25" value={projectForm.actual_hours} onChange={(e) => setProjectForm({ ...projectForm, actual_hours: Number(e.target.value) })} />
+            </div>
+          </section>
           <FormTextarea label="Notes" rows={3} value={projectForm.notes} onChange={(e) => setProjectForm({ ...projectForm, notes: e.target.value })} />
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
             <button type="submit" disabled={submitting} className="flex-1 rounded-lg bg-amber-300 py-2 font-semibold text-black hover:bg-amber-400 disabled:bg-amber-300/50">
@@ -413,6 +581,17 @@ export default function ProjectsPage() {
               Cancel
             </button>
           </div>
+        </form>
+      </Modal>
+
+      <Modal isOpen={Boolean(costProject)} onClose={() => setCostProject(null)} title={`Add direct cost · ${costProject?.project_name || ""}`}>
+        <form onSubmit={saveDirectCost} className="space-y-4">
+          <FormSelect label="Cost type" value={costForm.direct_cost_type} onChange={(e) => setCostForm({ ...costForm, direct_cost_type: e.target.value })} options={["Contractor","Employee","Software","API","Travel","Other"].map((value) => ({ value, label: value }))} />
+          <div className="grid gap-4 sm:grid-cols-2"><FormInput label="Amount" type="number" min="0.01" step="0.01" required value={costForm.amount} onChange={(e) => setCostForm({ ...costForm, amount: Number(e.target.value) })} /><FormInput label="Expense date" type="date" required value={costForm.expense_date} onChange={(e) => setCostForm({ ...costForm, expense_date: e.target.value })} /></div>
+          <FormInput label="Vendor / payee" value={costForm.vendor} onChange={(e) => setCostForm({ ...costForm, vendor: e.target.value })} />
+          <FormTextarea label="Notes" rows={3} value={costForm.notes} onChange={(e) => setCostForm({ ...costForm, notes: e.target.value })} />
+          <p className="text-xs text-gray-500">This creates a project-linked expense and is included in direct project costs.</p>
+          <button disabled={submitting} className="w-full rounded-lg bg-amber-300 py-2.5 font-bold text-black disabled:opacity-50">{submitting ? "Saving..." : "Save direct cost"}</button>
         </form>
       </Modal>
 

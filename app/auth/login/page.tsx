@@ -4,7 +4,6 @@ import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { signIn } from "@/lib/auth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 function LoginContent() {
@@ -12,19 +11,25 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(() => {
+    if (!isSupabaseConfigured()) {
+      return "Portal configuration is missing. Please contact support.";
+    }
+    if (searchParams.get("error") === "unauthorized") {
+      return "Access denied. This portal is private.";
+    }
+    if (searchParams.get("error") === "signup-disabled") {
+      return "Account creation is invitation-only. Sign in with your authorised account.";
+    }
+    if (searchParams.get("error")) {
+      return "Could not complete sign in. Please try again.";
+    }
+    return "";
+  });
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Show error from proxy redirect (e.g. unauthorized account)
-    if (searchParams.get("error") === "unauthorized") {
-      setError("Access denied. This portal is private.");
-    }
-  }, [searchParams]);
-
-  useEffect(() => {
     if (!isSupabaseConfigured()) {
-      setError("Portal configuration is missing. Please contact support.");
       return;
     }
 
@@ -33,7 +38,7 @@ function LoginContent() {
       .getSession()
       .then(({ data: { session } }) => {
         if (isMounted && session) {
-          router.replace("/portal");
+          router.replace("/portal/today");
         }
       })
       .catch(() => {
@@ -49,16 +54,26 @@ function LoginContent() {
     setError("");
     setLoading(true);
 
-    const result = await signIn(email, password);
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await response.json();
 
-    if (!result.success) {
-      setError("Invalid email or password.");
+      if (!response.ok) {
+        setError(result.error || "Unable to sign in. Please try again.");
+        return;
+      }
+
+      // A full navigation guarantees the server sees the newly issued cookies.
+      window.location.assign(result.redirectTo || "/portal/today");
+    } catch {
+      setError("Unable to reach the login service. Please try again.");
+    } finally {
       setLoading(false);
-      return;
     }
-
-    router.push("/portal");
-    router.refresh();
   }
 
   return (

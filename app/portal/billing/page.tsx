@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { jsPDF } from "jspdf";
 import { supabase } from "@/lib/supabase";
 import {
@@ -156,6 +157,9 @@ export default function BillingPage() {
         .from("ventures")
         .select("id")
         .eq("status", "Active")
+        .is("archived_at", null)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1);
 
       if (ventureError) throw ventureError;
@@ -168,8 +172,8 @@ export default function BillingPage() {
       setVentureId(activeVentureId);
 
       const [clientsRes, invoicesRes] = await Promise.all([
-        supabase.from("clients").select("*").eq("venture_id", activeVentureId).order("client_name"),
-        supabase.from("invoices").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
+        supabase.from("clients").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("client_name"),
+        supabase.from("invoices").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
       ]);
 
       if (clientsRes.error) throw clientsRes.error;
@@ -464,10 +468,15 @@ export default function BillingPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this invoice and its billing records?")) return;
+    const reason = window.prompt("Why is this invoice being voided? This preserves all invoice and payment history.");
+    if (!reason?.trim()) return;
 
     try {
-      const { error: deleteError } = await supabase.from("invoices").delete().eq("id", id);
+      const { error: deleteError } = await supabase.from("invoices").update({
+        status: "Cancelled",
+        voided_at: new Date().toISOString(),
+        void_reason: reason.trim(),
+      }).eq("id", id);
       if (deleteError) throw deleteError;
       await loadData();
     } catch (err) {
@@ -808,12 +817,10 @@ export default function BillingPage() {
           <h1 className="text-3xl font-bold text-white">Billing & Payments</h1>
           <p className="mt-1 text-gray-400">Invoices, line items, payments, balances, and overdue tracking</p>
         </div>
-        <button
-          onClick={openAddModal}
-          className="w-full rounded-xl bg-amber-300 px-5 py-2.5 text-sm font-bold text-black transition hover:bg-amber-200 sm:w-auto"
-        >
-          + Create Invoice
-        </button>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <Link href="/portal/billing/recurring" className="rounded-xl border border-amber-300/20 px-5 py-2.5 text-center text-sm font-bold text-amber-200">Recurring services</Link>
+          <button onClick={openAddModal} className="w-full rounded-xl bg-amber-300 px-5 py-2.5 text-sm font-bold text-black transition hover:bg-amber-200 sm:w-auto">+ Create Invoice</button>
+        </div>
       </div>
 
       {error && (
@@ -931,7 +938,7 @@ export default function BillingPage() {
                     onClick={() => handleDelete(invoice.id)}
                     className="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition hover:bg-red-500/20"
                   >
-                    Delete
+                    Void
                   </button>
                 </div>
               </div>

@@ -46,7 +46,7 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
-    if (user.email !== PORTAL_ALLOWED_EMAIL) {
+    if (user.email?.toLowerCase() !== PORTAL_ALLOWED_EMAIL.toLowerCase()) {
       await supabase.auth.signOut();
       return NextResponse.redirect(
         new URL("/auth/login?error=unauthorized", request.url)
@@ -57,9 +57,9 @@ export async function proxy(request: NextRequest) {
   // Redirect to portal if already logged in as the allowed user
   if (
     (pathname === "/auth/login" || pathname === "/auth/signup") &&
-    user?.email === PORTAL_ALLOWED_EMAIL
+    user?.email?.toLowerCase() === PORTAL_ALLOWED_EMAIL.toLowerCase()
   ) {
-    return NextResponse.redirect(new URL("/portal", request.url));
+    return NextResponse.redirect(new URL("/portal/today", request.url));
   }
 
   return response;

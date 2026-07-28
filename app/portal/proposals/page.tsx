@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Client, Lead, Proposal, ProposalItem, PROPOSAL_STATUSES, ProposalStatus } from "@/lib/types";
+import { BusinessSettings, Client, Lead, Proposal, ProposalItem, PROPOSAL_STATUSES, ProposalStatus } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { LoadingState, EmptyState } from "@/components/Portal/States";
@@ -87,6 +87,9 @@ export default function ProposalsPage() {
         .from("ventures")
         .select("id")
         .eq("status", "Active")
+        .is("archived_at", null)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1);
 
       if (!ventures || ventures.length === 0) {
@@ -99,16 +102,16 @@ export default function ProposalsPage() {
 
       const [settingsRes, clientsRes, leadsRes, proposalsRes] = await Promise.all([
         supabase.from("business_settings").select("*").eq("venture_id", activeVentureId).maybeSingle(),
-        supabase.from("clients").select("*").eq("venture_id", activeVentureId).order("client_name"),
-        supabase.from("leads").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
-        supabase.from("proposals").select("*").eq("venture_id", activeVentureId).order("created_at", { ascending: false }),
+        supabase.from("clients").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("client_name"),
+        supabase.from("leads").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
+        supabase.from("proposals").select("*").eq("venture_id", activeVentureId).is("archived_at", null).order("created_at", { ascending: false }),
       ]);
 
       if (clientsRes.error) throw clientsRes.error;
       if (leadsRes.error) throw leadsRes.error;
       if (proposalsRes.error) throw proposalsRes.error;
 
-      const settings = settingsRes.data as any;
+      const settings = settingsRes.data as BusinessSettings | null;
       setProposalPrefix(settings?.proposal_prefix || "PROP");
       setInvoicePrefix(settings?.invoice_prefix || "INV");
       setDefaultTerms(settings?.default_payment_terms || "");
@@ -141,8 +144,8 @@ export default function ProposalsPage() {
           lead_name: proposal.lead_id ? leadMap.get(proposal.lead_id) : undefined,
         }))
       );
-    } catch (err: any) {
-      setError(err.message || "Unable to load proposals.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to load proposals.");
     } finally {
       setLoading(false);
     }
@@ -257,8 +260,8 @@ export default function ProposalsPage() {
 
       setShowModal(false);
       await loadData();
-    } catch (err: any) {
-      setError(err.message || "Unable to save proposal.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save proposal.");
     } finally {
       setSubmitting(false);
     }
@@ -272,7 +275,7 @@ export default function ProposalsPage() {
     }
 
     if (proposal.lead_id && status === "Accepted") {
-      await supabase.from("leads").update({ stage: "Closed Won" }).eq("id", proposal.lead_id);
+      await supabase.from("leads").update({ pipeline_stage: "Won" }).eq("id", proposal.lead_id);
     }
 
     loadData();
@@ -332,7 +335,7 @@ export default function ProposalsPage() {
         lead_id: proposal.lead_id,
         proposal_id: proposal.id,
         project_name: projectName,
-        status: "Planning",
+        status: "Awaiting Requirements",
         budget: proposal.subtotal,
         notes: `Created from proposal ${proposal.proposal_number}`,
       },
@@ -347,8 +350,8 @@ export default function ProposalsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this proposal?")) return;
-    const { error: deleteError } = await supabase.from("proposals").delete().eq("id", id);
+    if (!confirm("Archive this proposal? Its commercial history and line items will be retained.")) return;
+    const { error: deleteError } = await supabase.from("proposals").update({ archived_at: new Date().toISOString() }).eq("id", id);
     if (deleteError) {
       setError(deleteError.message);
       return;
@@ -430,7 +433,7 @@ export default function ProposalsPage() {
                   Create Invoice
                 </button>
                 <button onClick={() => handleDelete(proposal.id)} className="rounded bg-red-500/15 px-3 py-2 text-xs text-red-300 hover:bg-red-500/25">
-                  Delete
+                  Archive
                 </button>
               </div>
             </div>

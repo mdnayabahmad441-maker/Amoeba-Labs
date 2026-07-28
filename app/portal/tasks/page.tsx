@@ -43,6 +43,9 @@ export default function TasksPage() {
         .from("ventures")
         .select("id")
         .eq("status", "Active")
+        .is("archived_at", null)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1);
 
       if (!ventures || ventures.length === 0) {
@@ -53,7 +56,7 @@ export default function TasksPage() {
       const vId = ventures[0].id;
       setVentureId(vId);
 
-      let query = supabase.from("tasks").select("*").eq("venture_id", vId);
+      let query = supabase.from("tasks").select("*").eq("venture_id", vId).is("archived_at", null);
 
       if (filterStatus) {
         query = query.eq("status", filterStatus);
@@ -70,6 +73,8 @@ export default function TasksPage() {
           .select("*")
           .eq("venture_id", vId)
           .eq("status", "Active")
+          .is("archived_at", null)
+          .order("is_founder", { ascending: false })
           .order("full_name", { ascending: true }),
       ]);
 
@@ -106,7 +111,7 @@ export default function TasksPage() {
       due_date: "",
       priority: "Medium",
       status: "To Do",
-      assigned_employee_id: "",
+      assigned_employee_id: employees.find((employee) => employee.is_founder)?.id || "",
       assigned_to: "",
       assigned_to_phone: "",
     });
@@ -214,10 +219,10 @@ export default function TasksPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Are you sure you want to delete this task?")) return;
+    if (!confirm("Archive this task? Its execution history will be retained.")) return;
 
     try {
-      const { error: err } = await supabase.from("tasks").delete().eq("id", id);
+      const { error: err } = await supabase.from("tasks").update({ archived_at: new Date().toISOString() }).eq("id", id);
       if (err) throw err;
       loadData();
     } catch (err) {
@@ -384,7 +389,7 @@ export default function TasksPage() {
                 onClick={() => handleDelete(task.id)}
                 className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded hover:bg-red-500/30 transition"
               >
-                Delete
+                Archive
               </button>
             </div>
           )}

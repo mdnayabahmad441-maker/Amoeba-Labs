@@ -39,15 +39,23 @@ export default function Contact() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const params = new URLSearchParams(window.location.search);
 
     const payload = {
       source: "Website Contact",
-      formspreeEndpoint: "https://formspree.io/f/xeewqrzw",
       name: String(formData.get("name") || ""),
       company: String(formData.get("company") || ""),
       email: String(formData.get("email") || ""),
       phone: String(formData.get("phone") || ""),
       message: String(formData.get("message") || ""),
+      website: String(formData.get("website") || ""),
+      landingPage: `${window.location.pathname}${window.location.search}`,
+      referrer: document.referrer,
+      utmSource: params.get("utm_source") || "",
+      utmMedium: params.get("utm_medium") || "",
+      utmCampaign: params.get("utm_campaign") || "",
+      utmContent: params.get("utm_content") || "",
+      utmTerm: params.get("utm_term") || "",
     };
 
     try {
@@ -163,6 +171,14 @@ export default function Contact() {
                 onSubmit={handleSubmit}
                 className="rounded-3xl brand-panel p-8 space-y-5"
               >
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="absolute -left-[10000px] h-px w-px overflow-hidden"
+                />
                 {status === "success" && (
                   <div className="rounded-xl border border-green-400/25 bg-green-400/10 px-4 py-3 text-sm text-green-200">
                     Enquiry saved in the portal. I will get back to you soon.
@@ -184,6 +200,7 @@ export default function Contact() {
                       name="name"
                       placeholder="Your name"
                       required
+                      maxLength={120}
                       className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all text-sm"
                     />
                   </div>
@@ -195,6 +212,7 @@ export default function Contact() {
                       type="text"
                       name="company"
                       placeholder="Your company"
+                      maxLength={200}
                       className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all text-sm"
                     />
                   </div>
@@ -208,6 +226,7 @@ export default function Contact() {
                     type="tel"
                     name="phone"
                     placeholder="Phone / WhatsApp number"
+                    maxLength={30}
                     className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all text-sm"
                   />
                 </div>
@@ -221,6 +240,7 @@ export default function Contact() {
                     name="email"
                     placeholder="your@email.com"
                     required
+                    maxLength={254}
                     className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all text-sm"
                   />
                 </div>
@@ -234,6 +254,7 @@ export default function Contact() {
                     name="message"
                     placeholder="Tell us what is slowing the business down, wasting time, leaking revenue, or hurting customers..."
                     required
+                    maxLength={5000}
                     className="w-full px-4 py-3 rounded-xl bg-black/25 border border-amber-300/10 text-white placeholder-gray-600 focus:outline-none focus:border-amber-300/50 focus:bg-amber-300/5 transition-all resize-none text-sm"
                   />
                 </div>

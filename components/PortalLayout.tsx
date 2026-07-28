@@ -2,44 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { getCurrentUser, signOut } from "@/lib/auth";
-import { PORTAL_ALLOWED_EMAIL } from "@/lib/auth-config";
+import { signOut } from "@/lib/auth";
 import Link from "next/link";
 import Image from "next/image";
-import { User } from "@/lib/types";
-
 interface PortalLayoutProps {
   children: React.ReactNode;
+  userEmail: string;
+  currentDateLabel: string;
 }
 
-export default function PortalLayout({ children }: PortalLayoutProps) {
+export default function PortalLayout({ children, userEmail, currentDateLabel }: PortalLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadUser() {
-      const currentUser = await getCurrentUser();
-      if (!currentUser) {
-        router.replace("/auth/login");
-        router.refresh();
-        return;
-      }
-
-      if (currentUser.email !== PORTAL_ALLOWED_EMAIL) {
-        await signOut();
-        router.replace("/auth/login?error=unauthorized");
-        router.refresh();
-        return;
-      }
-
-      setUser(currentUser);
-      setLoading(false);
-    }
-    loadUser();
-  }, [router]);
+  const [moreOpen, setMoreOpen] = useState(() =>
+    ["/portal/employees", "/portal/tasks", "/portal/followups", "/portal/ventures", "/portal/settings"]
+      .some((href) => pathname.startsWith(href))
+  );
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(min-width: 768px)");
@@ -59,35 +38,33 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    );
-  }
+  const primaryNavItems = [
+    { href: "/portal/today", label: "Today", icon: "Now" },
+    { href: "/portal/leads", label: "Leads", icon: "L" },
+    { href: "/portal/calendar", label: "Calendar", icon: "Cal" },
+    { href: "/portal/clients", label: "Clients", icon: "C" },
+    { href: "/portal/proposals", label: "Proposals", icon: "P" },
+    { href: "/portal/projects", label: "Projects", icon: "Pr" },
+    { href: "/portal/billing", label: "Billing", icon: "₹" },
+    { href: "/portal/expenses", label: "Expenses", icon: "Ex" },
+    { href: "/portal/reports", label: "Reports", icon: "R" },
+  ];
 
-  const navItems = [
-    { href: "/portal", label: "Dashboard", icon: "📊" },
-    { href: "/portal/clients", label: "Clients", icon: "🏢" },
-    { href: "/portal/leads", label: "Leads", icon: "👥" },
-    { href: "/portal/followups", label: "Follow-ups", icon: "📞" },
-    { href: "/portal/employees", label: "Employees", icon: "Team" },
-    { href: "/portal/tasks", label: "Tasks", icon: "✅" },
-    { href: "/portal/proposals", label: "Proposals", icon: "📄" },
-    { href: "/portal/projects", label: "Projects", icon: "🧩" },
-    { href: "/portal/billing", label: "Billing", icon: "💰" },
-    { href: "/portal/expenses", label: "Expenses", icon: "Rs" },
-    { href: "/portal/ventures", label: "Ventures", icon: "🚀" },
-    { href: "/portal/settings", label: "Settings", icon: "⚙️" },
+  const secondaryNavItems = [
+    { href: "/portal/daily-checklist", label: "Daily checklist" },
+    { href: "/portal/employees", label: "Employees" },
+    { href: "/portal/tasks", label: "Tasks" },
+    { href: "/portal/followups", label: "Follow-ups" },
+    { href: "/portal/field-visits", label: "Field visits" },
+      { href: "/portal/ventures", label: "Business units" },
+    { href: "/portal/settings", label: "Business settings" },
   ];
 
   const isActive = (href: string) => {
-    if (href === "/portal") {
-      return pathname === "/portal";
-    }
     return pathname.startsWith(href);
   };
+
+  const secondaryActive = secondaryNavItems.some((item) => isActive(item.href));
 
   const handleNavClick = () => {
     if (typeof window !== "undefined" && window.innerWidth < 768) {
@@ -138,7 +115,7 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
 
         {/* Navigation */}
         <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto p-3 pb-4 sm:p-4">
-          {navItems.map((item) => (
+          {primaryNavItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
@@ -150,10 +127,56 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
               }`}
               title={item.label}
             >
-              <span className="text-xl">{item.icon}</span>
+              <span className="flex h-7 min-w-7 items-center justify-center rounded-md border border-amber-300/10 bg-amber-300/5 px-1 text-[10px] font-bold uppercase tracking-wide">
+                {item.icon}
+              </span>
               {sidebarOpen && <span className="text-sm">{item.label}</span>}
             </Link>
           ))}
+
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (!sidebarOpen) setSidebarOpen(true);
+                setMoreOpen((open) => !open);
+              }}
+              aria-expanded={moreOpen}
+              className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition ${
+                secondaryActive
+                  ? "border border-amber-300/30 bg-amber-300/10 text-amber-200"
+                  : "text-gray-400 hover:bg-amber-300/5"
+              }`}
+              title="More"
+            >
+              <span className="flex h-6 w-6 items-center justify-center text-lg">•••</span>
+              {sidebarOpen && (
+                <>
+                  <span className="flex-1 text-sm">More</span>
+                  <span className="text-xs" aria-hidden="true">{moreOpen ? "▲" : "▼"}</span>
+                </>
+              )}
+            </button>
+
+            {sidebarOpen && moreOpen && (
+              <div className="ml-5 mt-2 space-y-1 border-l border-amber-300/10 pl-3">
+                {secondaryNavItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={handleNavClick}
+                    className={`block rounded-lg px-3 py-2 text-sm transition ${
+                      isActive(item.href)
+                        ? "bg-amber-300/15 text-amber-200"
+                        : "text-gray-500 hover:bg-amber-300/5 hover:text-gray-300"
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         {/* Logout */}
@@ -182,10 +205,10 @@ export default function PortalLayout({ children }: PortalLayoutProps) {
               ☰
             </button>
             <h2 className="min-w-0 flex-1 truncate text-sm text-gray-400">
-              Welcome, <span className="text-white font-semibold">{user?.email?.split("@")[0]}</span>
+              Welcome, <span className="text-white font-semibold">{userEmail.split("@")[0]}</span>
             </h2>
             <div className="flex items-center gap-4">
-              <span className="whitespace-nowrap text-xs text-gray-400 sm:text-sm">{new Date().toLocaleDateString()}</span>
+              <span className="whitespace-nowrap text-xs text-gray-400 sm:text-sm">{currentDateLabel}</span>
             </div>
           </div>
         </header>

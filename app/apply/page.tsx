@@ -13,18 +13,27 @@ export default function ApplyPage() {
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const params = new URLSearchParams(window.location.search);
 
     const payload = {
       source: "Website Assessment",
-      formspreeEndpoint: "https://formspree.io/f/xbdejzzo",
       name: String(formData.get("name") || ""),
       email: String(formData.get("email") || ""),
+      phone: String(formData.get("phone") || ""),
       company: String(formData.get("company") || ""),
       industry: String(formData.get("industry") || ""),
       revenue: String(formData.get("revenue") || ""),
       team: String(formData.get("team") || ""),
       idea: String(formData.get("idea") || ""),
       why: String(formData.get("why") || ""),
+      website: String(formData.get("website") || ""),
+      landingPage: `${window.location.pathname}${window.location.search}`,
+      referrer: document.referrer,
+      utmSource: params.get("utm_source") || "",
+      utmMedium: params.get("utm_medium") || "",
+      utmCampaign: params.get("utm_campaign") || "",
+      utmContent: params.get("utm_content") || "",
+      utmTerm: params.get("utm_term") || "",
     };
 
     try {
@@ -69,6 +78,14 @@ export default function ApplyPage() {
           onSubmit={handleSubmit}
           className="brand-panel border border-amber-300/15 rounded-3xl p-8 md:p-10 space-y-6"
         >
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute -left-[10000px] h-px w-px overflow-hidden"
+          />
           {status === "success" && (
             <div className="rounded-xl border border-green-400/25 bg-green-400/10 px-4 py-3 text-sm text-green-200">
               Assessment request saved in the portal. I will get back to you soon.
@@ -85,6 +102,7 @@ export default function ApplyPage() {
             name="name"
             placeholder="Full Name"
             required
+            maxLength={120}
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />
 
@@ -93,6 +111,15 @@ export default function ApplyPage() {
             name="email"
             placeholder="Email Address"
             required
+            maxLength={254}
+            className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
+          />
+
+          <input
+            type="tel"
+            name="phone"
+            placeholder="Phone / WhatsApp Number"
+            maxLength={30}
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />
 
@@ -100,6 +127,7 @@ export default function ApplyPage() {
             type="text"
             name="company"
             placeholder="Company / Business Name"
+            maxLength={200}
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />
 
@@ -107,6 +135,7 @@ export default function ApplyPage() {
             type="text"
             name="industry"
             placeholder="Industry"
+            maxLength={200}
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />
 
@@ -127,6 +156,7 @@ export default function ApplyPage() {
           <textarea
             rows={4}
             name="idea"
+            maxLength={5000}
             placeholder="Describe the business problem you want to solve"
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />
@@ -134,6 +164,7 @@ export default function ApplyPage() {
           <textarea
             rows={5}
             name="why"
+            maxLength={5000}
             placeholder="What is the current impact? For example lost revenue, manual work, slow follow-ups, poor reporting, or customer issues."
             className="w-full p-4 rounded-xl bg-black/25 border border-amber-300/10 focus:outline-none focus:border-amber-300/50"
           />

@@ -48,6 +48,9 @@ export default function EmployeesPage() {
         .from("ventures")
         .select("id")
         .eq("status", "Active")
+        .is("archived_at", null)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1);
 
       if (ventureError) throw ventureError;
@@ -62,7 +65,8 @@ export default function EmployeesPage() {
       let query = supabase
         .from("employees")
         .select("*")
-        .eq("venture_id", activeVentureId);
+        .eq("venture_id", activeVentureId)
+        .is("archived_at", null);
 
       if (filterStatus) {
         query = query.eq("status", filterStatus);
@@ -171,10 +175,14 @@ export default function EmployeesPage() {
   }
 
   async function handleDelete(employee: Employee) {
-    if (!confirm(`Delete ${employee.full_name}? Existing tasks will keep their handover text but lose the employee link.`)) return;
+    if (employee.is_founder) {
+      setError("The founder assignment record must remain active.");
+      return;
+    }
+    if (!confirm(`Archive ${employee.full_name}? Assignments and historical records will be retained.`)) return;
 
     try {
-      const { error: deleteError } = await supabase.from("employees").delete().eq("id", employee.id);
+      const { error: deleteError } = await supabase.from("employees").update({ archived_at: new Date().toISOString(), status: "Inactive" }).eq("id", employee.id);
       if (deleteError) throw deleteError;
       await loadData();
     } catch (err) {
@@ -189,7 +197,7 @@ export default function EmployeesPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold text-white sm:text-4xl">Employees</h1>
-          <p className="mt-1 text-gray-400">Manage your team and hand task ownership to the right person</p>
+          <p className="mt-1 text-gray-400">Assignment records for internal work. Employees do not receive portal login access.</p>
         </div>
         <button
           onClick={openAddModal}
@@ -253,6 +261,7 @@ export default function EmployeesPage() {
                     }`}>
                       {employee.status}
                     </span>
+                    {employee.is_founder && <span className="rounded-full bg-amber-300/15 px-2 py-0.5 text-xs font-semibold text-amber-200">Default owner</span>}
                   </div>
                   <div className="flex flex-wrap gap-3 text-xs text-gray-500">
                     <span>{employee.role || "No role"}</span>
@@ -272,9 +281,10 @@ export default function EmployeesPage() {
                   </button>
                   <button
                     onClick={() => handleDelete(employee)}
-                    className="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition hover:bg-red-500/20"
+                    disabled={employee.is_founder}
+                    className="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-35"
                   >
-                    Delete
+                    Archive
                   </button>
                 </div>
               </div>

@@ -92,6 +92,9 @@ export default function ExpensesPage() {
         .from("ventures")
         .select("id")
         .eq("status", "Active")
+        .is("archived_at", null)
+        .order("is_default", { ascending: false })
+        .order("created_at", { ascending: true })
         .limit(1);
 
       if (ventureError) throw ventureError;
@@ -108,6 +111,7 @@ export default function ExpensesPage() {
         .select("id, full_name")
         .eq("venture_id", activeVentureId)
         .eq("status", "Active")
+        .is("archived_at", null)
         .order("full_name", { ascending: true });
 
       if (employeeError) throw employeeError;
@@ -116,7 +120,8 @@ export default function ExpensesPage() {
       let query = supabase
         .from("expenses")
         .select("*")
-        .eq("venture_id", activeVentureId);
+        .eq("venture_id", activeVentureId)
+        .is("archived_at", null);
 
       if (viewMode === "day") {
         query = query.eq("expense_date", selectedDate);
@@ -141,7 +146,7 @@ export default function ExpensesPage() {
     } finally {
       setLoading(false);
     }
-  }, [filterCategory, selectedDate, viewMode]);
+  }, [filterCategory, rangeEnd, rangeStart, selectedDate, viewMode]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -248,10 +253,10 @@ export default function ExpensesPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this expense?")) return;
+    if (!confirm("Archive this expense? The financial record will be retained for audit history.")) return;
 
     try {
-      const { error: deleteError } = await supabase.from("expenses").delete().eq("id", id);
+      const { error: deleteError } = await supabase.from("expenses").update({ archived_at: new Date().toISOString() }).eq("id", id);
       if (deleteError) throw deleteError;
       await loadData();
     } catch (err) {
@@ -484,7 +489,7 @@ export default function ExpensesPage() {
                     onClick={() => handleDelete(expense.id)}
                     className="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-400 transition hover:bg-red-500/20"
                   >
-                    Delete
+                    Archive
                   </button>
                 </div>
               </div>

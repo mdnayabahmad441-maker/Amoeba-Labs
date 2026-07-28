@@ -51,19 +51,38 @@ export default function FollowupModal({
       }]);
       if (err) throw err;
 
-      // Update lead's next_follow_up if provided
-      if (formData.next_follow_up && leadId) {
-        await supabase.from("leads")
-          .update({ next_follow_up: formData.next_follow_up })
-          .eq("id", leadId);
+      const contactTime = new Date(`${formData.follow_up_date}T12:00:00`).toISOString();
+      const nextActionTime = formData.next_follow_up ? new Date(`${formData.next_follow_up}T12:00:00`).toISOString() : null;
+      const channel = formData.type === "Call" ? "Phone" : formData.type === "Meeting" ? "In person" : formData.type;
+      const contactUpdate = {
+        last_contact_at: contactTime,
+        ...(nextActionTime ? { next_action_at: nextActionTime, next_action_type: formData.type, communication_channel: channel } : {}),
+      };
+      if (leadId) {
+        const { error: leadError } = await supabase.from("leads").update({ ...contactUpdate, next_follow_up: formData.next_follow_up || null }).eq("id", leadId);
+        if (leadError) throw leadError;
       }
+      if (clientId) {
+        const { error: clientError } = await supabase.from("clients").update(contactUpdate).eq("id", clientId);
+        if (clientError) throw clientError;
+      }
+      const relatedId = leadId || clientId;
+      if (relatedId) await supabase.from("activity_logs").insert([{
+        venture_id: ventureId,
+        record_type: leadId ? "Lead" : "Client",
+        record_id: relatedId,
+        related_lead_id: leadId || null,
+        related_client_id: clientId || null,
+        action: formData.status === "Done" ? "customer_interaction_completed" : "followup_scheduled",
+        details: { type: formData.type, notes: formData.notes || null, contact_date: formData.follow_up_date, next_action_at: nextActionTime },
+      }]);
 
       // Reset form
       setFormData({ type: "Call", notes: "", follow_up_date: today, next_follow_up: "", status: "Done" });
       onSaved();
       onClose();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save follow-up.");
     } finally {
       setSubmitting(false);
     }

@@ -36,6 +36,9 @@ ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 
 -- Use these permissive policies only for the current private-owner portal setup.
 -- Tighten them later if you add multiple portal users or teams.
+DROP POLICY IF EXISTS "Allow authenticated invoice item access" ON invoice_items;
+DROP POLICY IF EXISTS "Allow authenticated payment access" ON payments;
+
 CREATE POLICY "Allow authenticated invoice item access"
 ON invoice_items
 FOR ALL

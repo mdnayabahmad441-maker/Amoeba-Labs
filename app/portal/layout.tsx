@@ -41,9 +41,16 @@ export default async function Layout({
     redirect("/auth/login");
   }
 
-  if (user.email !== PORTAL_ALLOWED_EMAIL) {
+  if (user.email?.toLowerCase() !== PORTAL_ALLOWED_EMAIL.toLowerCase()) {
     redirect("/auth/login?error=unauthorized");
   }
 
-  return <PortalLayout>{children}</PortalLayout>;
+  const currentDateLabel = new Intl.DateTimeFormat("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  }).format(new Date());
+
+  return <PortalLayout userEmail={user.email || PORTAL_ALLOWED_EMAIL} currentDateLabel={currentDateLabel}>{children}</PortalLayout>;
 }

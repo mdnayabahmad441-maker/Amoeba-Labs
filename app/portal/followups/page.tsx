@@ -12,6 +12,7 @@ import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInp
 import { LoadingState, EmptyState } from "@/components/Portal/States";
 
 type FollowupRow = Followup & { contact_name: string; contact_type: "client" | "lead" };
+type ContactLookup = { id: string; client_name: string };
 
 const STATUS_COLORS = {
   Done: "bg-green-500/15 text-green-400 border-green-500/25",
@@ -51,25 +52,25 @@ export default function FollowupsPage() {
     try {
       setLoading(true);
       const { data: ventures } = await supabase
-        .from("ventures").select("id").eq("status", "Active").limit(1);
+        .from("ventures").select("id").eq("status", "Active").is("archived_at", null).order("is_default", { ascending: false }).order("created_at", { ascending: true }).limit(1);
       if (!ventures?.length) { setError("No active venture found"); return; }
       const vId = ventures[0].id;
       setVentureId(vId);
 
       const [fuRes, clientsRes, leadsRes] = await Promise.all([
-        supabase.from("followups").select("*").eq("venture_id", vId).order("follow_up_date", { ascending: false }),
+        supabase.from("followups").select("*").eq("venture_id", vId).is("archived_at", null).order("follow_up_date", { ascending: false }),
         supabase.from("clients").select("id, client_name").eq("venture_id", vId).order("client_name"),
         supabase.from("leads").select("id, client_name").eq("venture_id", vId).order("client_name"),
       ]);
 
-      const clientMap = new Map((clientsRes.data || []).map((c: any) => [c.id, c.client_name]));
-      const leadMap = new Map((leadsRes.data || []).map((l: any) => [l.id, l.client_name]));
+      const clientMap = new Map((clientsRes.data || []).map((client: ContactLookup) => [client.id, client.client_name]));
+      const leadMap = new Map((leadsRes.data || []).map((lead: ContactLookup) => [lead.id, lead.client_name]));
 
       setClients((clientsRes.data as Client[]) || []);
       setLeads((leadsRes.data as Lead[]) || []);
 
       setFollowups(
-        (fuRes.data || []).map((f: any) => ({
+        ((fuRes.data || []) as Followup[]).map((f) => ({
           ...f,
           contact_name: f.client_id
             ? (clientMap.get(f.client_id) || "Unknown")
@@ -79,8 +80,8 @@ export default function FollowupsPage() {
           contact_type: f.client_id ? "client" : "lead",
         }))
       );
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to load follow-ups.");
     } finally {
       setLoading(false);
     }
@@ -144,8 +145,8 @@ export default function FollowupsPage() {
 
       setShowModal(false);
       loadData();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Unable to save follow-up.");
     } finally {
       setSubmitting(false);
     }
@@ -157,8 +158,8 @@ export default function FollowupsPage() {
   }
 
   async function handleDelete(id: string) {
-    if (!confirm("Delete this follow-up?")) return;
-    await supabase.from("followups").delete().eq("id", id);
+    if (!confirm("Archive this follow-up? Its communication history will be retained.")) return;
+    await supabase.from("followups").update({ archived_at: new Date().toISOString() }).eq("id", id);
     loadData();
   }
 
@@ -308,7 +309,7 @@ export default function FollowupsPage() {
                     </button>
                     <button onClick={() => handleDelete(f.id)}
                       className="text-xs px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition">
-                      Delete
+                      Archive
                     </button>
                   </div>
                 </div>
