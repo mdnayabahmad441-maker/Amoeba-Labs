@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import "./groenics.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,9 +14,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Groenics - Business Problem Solving Company",
+  metadataBase: new URL("https://www.groenics.online"),
+  title: {
+    default: "Groenics | AI Automation, ERP, CRM & Business Systems",
+    template: "%s | Groenics",
+  },
   description:
-    "Groenics identifies operational, sales, marketing, customer service, management, and workflow problems, then solves them with AI, automation, and custom software.",
+    "Groenics builds practical AI automation, ERP, CRM, dashboards, websites, and custom business systems for growing businesses.",
+  keywords: ["AI automation India", "ERP development", "CRM systems", "business automation", "custom software company"],
+  openGraph: {
+    type: "website",
+    locale: "en_IN",
+    siteName: "Groenics",
+    title: "Groenics | Practical Business Systems",
+    description: "AI automation, ERP, CRM, dashboards and custom software built around real business problems.",
+    url: "https://www.groenics.online",
+  },
+  twitter: { card: "summary_large_image", title: "Groenics | Practical Business Systems", description: "AI automation, ERP, CRM and software for growing businesses." },
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
