@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-import { PORTAL_ALLOWED_EMAIL } from "@/lib/auth-config";
+import { isPortalAllowedEmail } from "@/lib/auth-config";
 import { checkRateLimit, getRequestIp } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
@@ -68,7 +68,7 @@ export async function POST(request: Request) {
     );
   }
 
-  if (data.user.email?.toLowerCase() !== PORTAL_ALLOWED_EMAIL.toLowerCase()) {
+  if (!isPortalAllowedEmail(data.user.email)) {
     await supabase.auth.signOut();
     return NextResponse.json(
       { error: "Invalid email or password." },

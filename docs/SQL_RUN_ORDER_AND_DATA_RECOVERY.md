@@ -60,9 +60,9 @@ Run `DATA_VISIBILITY_DIAGNOSTIC.sql`. It is read-only.
 - If client counts appear under a non-default business, open **More → Business
   units** and make that business the default, or use the Business-unit filter
   in Reports. Do not move records merely to make them appear.
-- If the founder has no Active membership for a venture, rerun
-  `SECURITY_AND_DATA_PROTECTION_UPGRADE.sql` after confirming the configured
-  founder email is `mdnayabahmad441@gmail.com`.
+- If the founder has no Active membership for a venture, run
+  `PORTAL_ALLOWED_USERS_UPGRADE.sql` after confirming the configured portal
+  emails are `groenics@gmail.com` and `mdnayabahmad441@gmail.com`.
 - If records have an `archived_at` value, investigate each record before
   restoring it. Never run a blanket unarchive statement.
 - If the diagnostic itself fails on a missing column or table, return to the

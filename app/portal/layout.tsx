@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PortalLayout from "@/components/PortalLayout";
-import { PORTAL_ALLOWED_EMAIL } from "@/lib/auth-config";
+import { PORTAL_ALLOWED_EMAIL, isPortalAllowedEmail } from "@/lib/auth-config";
 
 export const metadata = {
   title: "Groenics Portal",
@@ -41,7 +41,7 @@ export default async function Layout({
     redirect("/auth/login");
   }
 
-  if (user.email?.toLowerCase() !== PORTAL_ALLOWED_EMAIL.toLowerCase()) {
+  if (!isPortalAllowedEmail(user.email)) {
     redirect("/auth/login?error=unauthorized");
   }
 

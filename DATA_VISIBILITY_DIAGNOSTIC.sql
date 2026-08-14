@@ -29,7 +29,10 @@ SELECT
 FROM auth.users users
 LEFT JOIN portal_memberships membership ON membership.user_id = users.id
 LEFT JOIN ventures venture ON venture.id = membership.venture_id
-WHERE lower(users.email) = lower('mdnayabahmad441@gmail.com')
+WHERE lower(users.email) IN (
+  lower('groenics@gmail.com'),
+  lower('mdnayabahmad441@gmail.com')
+)
 ORDER BY venture.venture_name;
 
 SELECT

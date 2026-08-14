@@ -62,13 +62,16 @@ $$;
 REVOKE ALL ON FUNCTION public.is_portal_founder() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_portal_founder() TO authenticated;
 
--- Seed the existing founder into every current venture. Change this email only
--- if the application's PORTAL_ALLOWED_EMAIL is changed at the same time.
+-- Seed allowed portal founders into every current venture. Keep this list in
+-- sync with the application's PORTAL_ALLOWED_EMAILS default or environment.
 INSERT INTO portal_memberships (user_id, venture_id, role, status)
 SELECT users.id, ventures.id, 'Founder', 'Active'
 FROM auth.users AS users
 CROSS JOIN ventures
-WHERE LOWER(users.email) = LOWER('mdnayabahmad441@gmail.com')
+WHERE LOWER(users.email) IN (
+  LOWER('groenics@gmail.com'),
+  LOWER('mdnayabahmad441@gmail.com')
+)
 ON CONFLICT (user_id, venture_id)
 DO UPDATE SET role = 'Founder', status = 'Active', updated_at = NOW();
 

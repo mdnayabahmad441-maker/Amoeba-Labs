@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { PORTAL_ALLOWED_EMAIL } from "@/lib/auth-config";
+import { isPortalAllowedEmail } from "@/lib/auth-config";
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
@@ -46,7 +46,7 @@ export async function proxy(request: NextRequest) {
     if (!user) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
-    if (user.email?.toLowerCase() !== PORTAL_ALLOWED_EMAIL.toLowerCase()) {
+    if (!isPortalAllowedEmail(user.email)) {
       await supabase.auth.signOut();
       return NextResponse.redirect(
         new URL("/auth/login?error=unauthorized", request.url)
@@ -57,7 +57,7 @@ export async function proxy(request: NextRequest) {
   // Redirect to portal if already logged in as the allowed user
   if (
     (pathname === "/auth/login" || pathname === "/auth/signup") &&
-    user?.email?.toLowerCase() === PORTAL_ALLOWED_EMAIL.toLowerCase()
+    isPortalAllowedEmail(user?.email)
   ) {
     return NextResponse.redirect(new URL("/portal/today", request.url));
   }
