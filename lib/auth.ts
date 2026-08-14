@@ -4,6 +4,10 @@
 import { supabase } from "./supabase";
 import { User } from "./types";
 
+function errorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "An unexpected authentication error occurred.";
+}
+
 export async function signUp(email: string, password: string, fullName?: string) {
   try {
     const { data, error } = await supabase.auth.signUp({
@@ -18,8 +22,8 @@ export async function signUp(email: string, password: string, fullName?: string)
 
     if (error) throw error;
     return { success: true, data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -32,8 +36,8 @@ export async function signIn(email: string, password: string) {
 
     if (error) throw error;
     return { success: true, data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -42,8 +46,8 @@ export async function signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -53,7 +57,7 @@ export async function getCurrentUser(): Promise<User | null> {
       data: { user },
     } = await supabase.auth.getUser();
     return user as User | null;
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -66,8 +70,8 @@ export async function resetPassword(email: string) {
 
     if (error) throw error;
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -79,8 +83,8 @@ export async function updatePassword(newPassword: string) {
 
     if (error) throw error;
     return { success: true };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }
 
@@ -95,7 +99,7 @@ export async function signInWithGoogle() {
 
     if (error) throw error;
     return { success: true, data };
-  } catch (error: any) {
-    return { success: false, error: error.message };
+  } catch (error: unknown) {
+    return { success: false, error: errorMessage(error) };
   }
 }

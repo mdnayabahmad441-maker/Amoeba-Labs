@@ -1,10 +1,12 @@
 "use client";
 
-interface Column<T> {
-  key: keyof T;
-  label: string;
-  render?: (value: any, item: T) => React.ReactNode;
-}
+type Column<T> = {
+  [K in keyof T]: {
+    key: K;
+    label: string;
+    render?: (value: T[K], item: T) => React.ReactNode;
+  }
+}[keyof T];
 
 interface DataTableProps<T> {
   data: T[];

@@ -7,6 +7,7 @@ import { Employee, Task, TodayActionItem, TodayRecordType, Venture } from "@/lib
 import { EmptyState, ErrorState, LoadingState } from "@/components/Portal/States";
 import Modal from "@/components/Portal/Modal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
+import TodayChecklistPanel from "@/components/Portal/TodayChecklistPanel";
 
 type Priority = Task["priority"];
 
@@ -358,6 +359,8 @@ export default function TodayPage() {
       {migrationMissing && <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">Run <code>TODAY_COMMAND_CENTRE_UPGRADE.sql</code> in Supabase to enable audited quick actions and manual daily records.</div>}
       {error && <ErrorState message={error} />}
       {notice && <div className="rounded-xl border border-green-500/20 bg-green-500/10 p-3 text-sm text-green-300">{notice}</div>}
+
+      <TodayChecklistPanel />
 
       <div className="grid gap-3 rounded-2xl border border-amber-300/10 bg-black/20 p-4 sm:grid-cols-2 xl:grid-cols-6">
         <FormSelect value={employeeFilter} onChange={(event) => setEmployeeFilter(event.target.value)} placeholder="All employees" options={employees.map((employee) => ({ value: employee.id, label: employee.full_name }))} />

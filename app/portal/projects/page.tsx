@@ -92,6 +92,18 @@ const emptyMilestone: MilestoneForm = {
 };
 
 const money = (value: number | null | undefined) => `Rs. ${Number(value || 0).toLocaleString("en-IN")}`;
+type DirectCostType = "Contractor" | "Employee" | "Software" | "API" | "Travel" | "Other";
+type DirectCostLine = {
+  id: string;
+  direct_cost_type: DirectCostType;
+  amount: number;
+  expense_date: string;
+  vendor: string;
+  notes: string;
+};
+const newCostLine = (type: DirectCostLine["direct_cost_type"], date: string): DirectCostLine => ({
+  id: crypto.randomUUID(), direct_cost_type: type, amount: 0, expense_date: date, vendor: "", notes: "",
+});
 
 export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
@@ -109,7 +121,7 @@ export default function ProjectsPage() {
   const [submitting, setSubmitting] = useState(false);
   const [timelineProject, setTimelineProject] = useState<ProjectRow | null>(null);
   const [costProject, setCostProject] = useState<ProjectRow | null>(null);
-  const [costForm, setCostForm] = useState({ direct_cost_type: "Contractor", amount: 0, expense_date: "", vendor: "", notes: "" });
+  const [costLines, setCostLines] = useState<DirectCostLine[]>([]);
   const [projectForm, setProjectForm] = useState<ProjectForm>(emptyProject);
   const [milestoneForm, setMilestoneForm] = useState<MilestoneForm>(emptyMilestone);
 
@@ -121,6 +133,10 @@ export default function ProjectsPage() {
     () => (filterStatus ? projects.filter((project) => project.status === filterStatus) : projects),
     [filterStatus, projects]
   );
+  const newCostTotal = costLines.reduce((sum, line) => sum + Number(line.amount || 0), 0);
+  const projectRevenue = Number(costProject?.profitability?.profitability_revenue || costProject?.recognized_revenue || 0);
+  const existingProjectCosts = Number(costProject?.profitability?.direct_costs || 0);
+  const projectedProjectProfit = projectRevenue - existingProjectCosts - newCostTotal;
 
   async function loadData() {
     try {
@@ -345,24 +361,27 @@ export default function ProjectsPage() {
 
   function openDirectCost(project: ProjectRow) {
     setCostProject(project);
-    setCostForm({ direct_cost_type: "Contractor", amount: 0, expense_date: new Date().toISOString().slice(0, 10), vendor: "", notes: "" });
+    const date = new Date().toISOString().slice(0, 10);
+    setCostLines(Array.from({ length: 4 }, () => newCostLine("Other", date)));
   }
 
   async function saveDirectCost(event: React.FormEvent) {
     event.preventDefault();
-    if (!costProject || costForm.amount <= 0) return;
+    if (!costProject) return;
+    const validLines = costLines.filter((line) => line.amount > 0);
+    if (!validLines.length) { setError("Enter an amount for at least one direct-cost line."); return; }
     setSubmitting(true);
-    const { error: costError } = await supabase.from("expenses").insert([{
+    const { error: costError } = await supabase.from("expenses").insert(validLines.map((line) => ({
       venture_id: costProject.venture_id,
       project_id: costProject.id,
-      direct_cost_type: costForm.direct_cost_type,
-      category: costForm.direct_cost_type === "Travel" ? "Travel" : ["Software", "API"].includes(costForm.direct_cost_type) ? "Software" : "Client Work",
-      amount: costForm.amount,
-      expense_date: costForm.expense_date,
+      direct_cost_type: line.direct_cost_type,
+      category: "Client Work",
+      amount: line.amount,
+      expense_date: line.expense_date,
       payment_method: "Bank Transfer",
-      vendor: costForm.vendor.trim() || null,
-      notes: costForm.notes.trim() || null,
-    }]);
+      vendor: line.vendor.trim() || null,
+      notes: line.notes.trim() || null,
+    })));
     setSubmitting(false);
     if (costError) { setError(costError.message); return; }
     setCostProject(null);
@@ -456,21 +475,23 @@ export default function ProjectsPage() {
               </div>
 
               {project.profitability ? (
-                <div className="mt-4 rounded-xl border border-sky-500/20 bg-sky-500/5 p-3">
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.025] p-3">
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div><p className="text-sm font-semibold text-white">Project profitability</p><p className="text-[11px] text-gray-500">Gross profit uses {project.profitability.profitability_basis.toLowerCase()} revenue.</p></div>
-                    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${project.profitability.profitability_health === "Healthy" ? "bg-green-500/15 text-green-300" : project.profitability.profitability_health === "Low margin" ? "bg-yellow-500/15 text-yellow-300" : "bg-red-500/15 text-red-300"}`}>{project.profitability.profitability_health}</span>
+                    <div><p className="text-sm font-semibold text-white">Project money</p><p className="text-[11px] text-gray-500">Income − expenses = profit or loss</p></div>
+                    <span className={`rounded-full px-2 py-1 text-xs font-semibold ${project.profitability.profitability_revenue <= 0 ? "bg-white/8 text-gray-400" : project.profitability.gross_profit > 0 ? "bg-green-500/15 text-green-300" : project.profitability.gross_profit < 0 ? "bg-red-500/15 text-red-300" : "bg-amber-300/15 text-amber-200"}`}>{project.profitability.profitability_revenue <= 0 ? "Add income" : project.profitability.gross_profit > 0 ? "Profitable" : project.profitability.gross_profit < 0 ? "Loss-making" : "Break-even"}</span>
                   </div>
                   <div className="mt-3 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
-                    <div><p className="text-gray-500">Invoiced</p><p className="font-semibold text-white">{money(project.profitability.invoiced_amount)}</p></div>
-                    <div><p className="text-gray-500">Collected</p><p className="font-semibold text-green-300">{money(project.profitability.collected_amount)}</p></div>
-                    <div><p className="text-gray-500">Direct costs</p><p className="font-semibold text-red-300">{money(project.profitability.direct_costs)}</p></div>
-                    <div><p className="text-gray-500">Gross profit</p><p className="font-semibold text-amber-200">{money(project.profitability.gross_profit)}</p></div>
-                    <div><p className="text-gray-500">Gross margin</p><p className="font-semibold text-white">{project.profitability.gross_margin === null ? "Not available" : `${project.profitability.gross_margin}%`}</p></div>
-                    <div><p className="text-gray-500">Outstanding</p><p className="font-semibold text-orange-200">{money(project.profitability.outstanding_amount)}</p></div>
-                    <div><p className="text-gray-500">Cost variance</p><p className="font-semibold text-white">{money(project.profitability.budget_variance)}</p></div>
-                    <div><p className="text-gray-500">Revenue/hour</p><p className="font-semibold text-white">{project.profitability.effective_revenue_per_hour === null ? "Add hours" : money(project.profitability.effective_revenue_per_hour)}</p></div>
+                    <div><p className="text-gray-500">Project income</p><p className="font-semibold text-white">{money(project.profitability.profitability_revenue)}</p></div>
+                    <div><p className="text-gray-500">All expenses</p><p className="font-semibold text-red-300">{money(project.profitability.direct_costs)}</p></div>
+                    <div><p className="text-gray-500">{project.profitability.gross_profit >= 0 ? "Your profit" : "Your loss"}</p><p className={`font-bold ${project.profitability.gross_profit >= 0 ? "text-green-300" : "text-red-300"}`}>{money(Math.abs(project.profitability.gross_profit))}</p></div>
+                    <div><p className="text-gray-500">Client still has to pay</p><p className="font-semibold text-orange-200">{money(project.profitability.outstanding_amount)}</p></div>
                   </div>
+                  <p className="mt-3 text-xs text-gray-400">
+                    {money(project.profitability.profitability_revenue)} income - {money(project.profitability.direct_costs)} expenses ={" "}
+                    <span className={project.profitability.gross_profit >= 0 ? "text-green-300" : "text-red-300"}>
+                      {money(Math.abs(project.profitability.gross_profit))} {project.profitability.gross_profit >= 0 ? "profit" : "loss"}
+                    </span>
+                  </p>
                   <details className="mt-3 text-xs text-gray-400"><summary className="cursor-pointer text-sky-300">Cost breakdown</summary><p className="mt-2">Contractor {money(project.profitability.contractor_cost)} · Employee {money(project.profitability.employee_cost)} · Software {money(project.profitability.software_cost)} · API {money(project.profitability.api_cost)} · Travel {money(project.profitability.travel_cost)} · Other {money(project.profitability.other_cost)}</p></details>
                 </div>
               ) : <p className="mt-4 rounded-xl border border-sky-500/15 bg-sky-500/5 p-3 text-xs text-sky-200">Apply the Phase 11 migration to calculate project profitability.</p>}
@@ -562,15 +583,19 @@ export default function ProjectsPage() {
             </div>
           </section>
           <FormInput label="Budget" type="number" min="0" step="0.01" value={projectForm.budget} onChange={(e) => setProjectForm({ ...projectForm, budget: Number(e.target.value) })} />
-          <section className="space-y-4 rounded-xl border border-sky-500/15 bg-sky-500/5 p-4">
-            <div><h3 className="font-semibold text-sky-200">Profitability settings</h3><p className="text-xs text-gray-500">Choose the revenue basis explicitly. Collected revenue is the safest cash view; recognized revenue must be entered deliberately.</p></div>
+          <section className="space-y-4 rounded-xl border border-white/10 bg-white/[0.025] p-4">
+            <div><h3 className="font-semibold text-white">Project money</h3><p className="text-xs text-gray-500">Enter what the client is paying. Add real expenses later with + Direct cost.</p></div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <FormSelect label="Gross-profit revenue basis" value={projectForm.profitability_basis} onChange={(e) => setProjectForm({ ...projectForm, profitability_basis: e.target.value as Project["profitability_basis"] })} options={["Collected","Invoiced","Recognized"].map((value) => ({ value, label: `${value} revenue` }))} />
-              <FormInput label="Recognized revenue" type="number" min="0" step="0.01" value={projectForm.recognized_revenue} onChange={(e) => setProjectForm({ ...projectForm, recognized_revenue: Number(e.target.value) })} />
-              <FormInput label="Direct-cost budget" type="number" min="0" step="0.01" value={projectForm.direct_cost_budget} onChange={(e) => setProjectForm({ ...projectForm, direct_cost_budget: Number(e.target.value) })} />
-              <FormInput label="Estimated hours" type="number" min="0" step="0.25" value={projectForm.estimated_hours} onChange={(e) => setProjectForm({ ...projectForm, estimated_hours: Number(e.target.value) })} />
-              <FormInput label="Actual hours" type="number" min="0" step="0.25" value={projectForm.actual_hours} onChange={(e) => setProjectForm({ ...projectForm, actual_hours: Number(e.target.value) })} />
+              <FormInput label="Project income" type="number" min="0" step="0.01" value={projectForm.recognized_revenue} onChange={(e) => setProjectForm({ ...projectForm, recognized_revenue: Number(e.target.value), profitability_basis: "Recognized" })} />
+              <FormInput label="Expected expense budget (optional)" type="number" min="0" step="0.01" value={projectForm.direct_cost_budget} onChange={(e) => setProjectForm({ ...projectForm, direct_cost_budget: Number(e.target.value) })} />
             </div>
+            <details className="rounded-lg border border-white/10 p-3">
+              <summary className="cursor-pointer text-sm text-gray-300">Optional time tracking</summary>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <FormInput label="Estimated hours" type="number" min="0" step="0.25" value={projectForm.estimated_hours} onChange={(e) => setProjectForm({ ...projectForm, estimated_hours: Number(e.target.value) })} />
+                <FormInput label="Actual hours" type="number" min="0" step="0.25" value={projectForm.actual_hours} onChange={(e) => setProjectForm({ ...projectForm, actual_hours: Number(e.target.value) })} />
+              </div>
+            </details>
           </section>
           <FormTextarea label="Notes" rows={3} value={projectForm.notes} onChange={(e) => setProjectForm({ ...projectForm, notes: e.target.value })} />
           <div className="flex flex-col gap-3 pt-2 sm:flex-row">
@@ -584,14 +609,30 @@ export default function ProjectsPage() {
         </form>
       </Modal>
 
-      <Modal isOpen={Boolean(costProject)} onClose={() => setCostProject(null)} title={`Add direct cost · ${costProject?.project_name || ""}`}>
+      <Modal isOpen={Boolean(costProject)} onClose={() => setCostProject(null)} title={`Add project expenses · ${costProject?.project_name || ""}`}>
         <form onSubmit={saveDirectCost} className="space-y-4">
-          <FormSelect label="Cost type" value={costForm.direct_cost_type} onChange={(e) => setCostForm({ ...costForm, direct_cost_type: e.target.value })} options={["Contractor","Employee","Software","API","Travel","Other"].map((value) => ({ value, label: value }))} />
-          <div className="grid gap-4 sm:grid-cols-2"><FormInput label="Amount" type="number" min="0.01" step="0.01" required value={costForm.amount} onChange={(e) => setCostForm({ ...costForm, amount: Number(e.target.value) })} /><FormInput label="Expense date" type="date" required value={costForm.expense_date} onChange={(e) => setCostForm({ ...costForm, expense_date: e.target.value })} /></div>
-          <FormInput label="Vendor / payee" value={costForm.vendor} onChange={(e) => setCostForm({ ...costForm, vendor: e.target.value })} />
-          <FormTextarea label="Notes" rows={3} value={costForm.notes} onChange={(e) => setCostForm({ ...costForm, notes: e.target.value })} />
-          <p className="text-xs text-gray-500">This creates a project-linked expense and is included in direct project costs.</p>
-          <button disabled={submitting} className="w-full rounded-lg bg-amber-300 py-2.5 font-bold text-black disabled:opacity-50">{submitting ? "Saving..." : "Save direct cost"}</button>
+          <p className="text-sm text-gray-400">Simply write what you paid for and the amount. Add as many expense rows as you need.</p>
+          <div className="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
+            {costLines.map((line, index) => (
+              <div key={line.id} className="grid grid-cols-[minmax(0,1fr)_130px_36px] gap-2">
+                <input value={line.vendor} onChange={(e) => setCostLines((current) => current.map((item) => item.id === line.id ? { ...item, vendor: e.target.value } : item))} placeholder="Expense name — employee, software, travel…" aria-label={`Expense name ${index + 1}`} className="rounded-lg border border-white/10 bg-[#11100d] px-3 py-2.5 text-sm text-white"/>
+                <input type="number" min="0" step="0.01" value={line.amount || ""} onChange={(e) => setCostLines((current) => current.map((item) => item.id === line.id ? { ...item, amount: Number(e.target.value) } : item))} placeholder="Amount" aria-label={`Expense amount ${index + 1}`} className="rounded-lg border border-white/10 bg-[#11100d] px-3 py-2.5 text-sm text-white"/>
+                <button type="button" onClick={() => setCostLines((current) => current.filter((item) => item.id !== line.id))} aria-label={`Remove expense ${index + 1}`} className="rounded-lg text-red-300 hover:bg-red-500/10">×</button>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <button type="button" onClick={() => setCostLines((current) => [...current, newCostLine("Other", new Date().toISOString().slice(0, 10))])} className="rounded-lg border border-white/10 px-3 py-2 text-sm text-gray-300">+ Add expense</button>
+            <p className="text-sm text-gray-400">New expenses: <strong className="text-amber-200">{money(newCostTotal)}</strong></p>
+          </div>
+          <div className={`rounded-xl border p-4 ${projectRevenue <= 0 ? "border-gray-500/20 bg-white/[0.03]" : projectedProjectProfit > 0 ? "border-green-500/25 bg-green-500/[0.07]" : projectedProjectProfit < 0 ? "border-red-500/25 bg-red-500/[0.07]" : "border-amber-300/25 bg-amber-300/[0.06]"}`}>
+            <p className="text-xs uppercase tracking-wider text-gray-500">Projected result after these expenses</p>
+            {projectRevenue <= 0 ? <p className="mt-2 font-semibold text-gray-300">Revenue is not recorded yet, so profit or loss cannot be calculated.</p> : <>
+              <p className={`mt-2 text-xl font-bold ${projectedProjectProfit > 0 ? "text-green-300" : projectedProjectProfit < 0 ? "text-red-300" : "text-amber-200"}`}>{projectedProjectProfit > 0 ? `Profitable · ${money(projectedProjectProfit)} profit` : projectedProjectProfit < 0 ? `Loss-making · ${money(Math.abs(projectedProjectProfit))} loss` : "Break-even"}</p>
+              <p className="mt-1 text-xs text-gray-500">Revenue {money(projectRevenue)} − total costs {money(existingProjectCosts + newCostTotal)}</p>
+            </>}
+          </div>
+          <button disabled={submitting || !costLines.some((line) => line.amount > 0)} className="w-full rounded-lg bg-amber-300 py-3 font-bold text-black disabled:opacity-50">{submitting ? "Saving expenses..." : "Save all expenses"}</button>
         </form>
       </Modal>
 
