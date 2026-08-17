@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { CreateEmployeeInput, Employee, EMPLOYEE_STATUSES } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
+import EmployeeIdCardModal from "@/components/Portal/EmployeeIdCardModal";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { EmptyState, LoadingState } from "@/components/Portal/States";
 
@@ -28,6 +29,8 @@ export default function EmployeesPage() {
   const [filterStatus, setFilterStatus] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [idCardEmployee, setIdCardEmployee] = useState<Employee | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateEmployeeInput>({
     full_name: "",
@@ -119,6 +122,7 @@ export default function EmployeesPage() {
       notes: "",
     });
     setEditingId(null);
+    setPhotoFile(null);
     setShowModal(true);
   }
 
@@ -133,7 +137,36 @@ export default function EmployeesPage() {
       notes: employee.notes || "",
     });
     setEditingId(employee.id);
+    setPhotoFile(null);
     setShowModal(true);
+  }
+
+  async function uploadEmployeePhoto(employeeId: string, file: File) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024) {
+      throw new Error("Use a JPG, PNG, or WebP photo up to 5 MB.");
+    }
+    const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
+    const photoPath = `${ventureId}/${employeeId}/photo.${extension}`;
+    const { error: uploadError } = await supabase.storage.from("employee-photos").upload(photoPath, file, { upsert: true, contentType: file.type });
+    if (uploadError) throw uploadError;
+    const { data: publicUrl } = supabase.storage.from("employee-photos").getPublicUrl(photoPath);
+    // Supabase Storage keeps the same path on replacement; version the URL so browsers fetch the new image.
+    const versionedPhotoUrl = `${publicUrl.publicUrl}?v=${Date.now()}`;
+    const { error: photoUpdateError } = await supabase.from("employees").update({ photo_url: versionedPhotoUrl }).eq("id", employeeId);
+    if (photoUpdateError) throw photoUpdateError;
+    return versionedPhotoUrl;
+  }
+
+  async function handleIdCardPhotoUpload(file: File) {
+    if (!idCardEmployee) return;
+    try {
+      const photoUrl = await uploadEmployeePhoto(idCardEmployee.id, file);
+      const updatedEmployee = { ...idCardEmployee, photo_url: photoUrl };
+      setIdCardEmployee(updatedEmployee);
+      setEmployees((current) => current.map((employee) => employee.id === updatedEmployee.id ? updatedEmployee : employee));
+    } catch (err) {
+      setError(employeeErrorMessage(err));
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -157,12 +190,18 @@ export default function EmployeesPage() {
     };
 
     try {
+      let employeeId = editingId;
       if (editingId) {
         const { error: updateError } = await supabase.from("employees").update(payload).eq("id", editingId);
         if (updateError) throw updateError;
       } else {
-        const { error: insertError } = await supabase.from("employees").insert([{ ...payload, venture_id: ventureId }]);
+        const { data: insertedEmployee, error: insertError } = await supabase.from("employees").insert([{ ...payload, venture_id: ventureId }]).select("id").single();
         if (insertError) throw insertError;
+        employeeId = insertedEmployee.id;
+      }
+
+      if (photoFile && employeeId) {
+        await uploadEmployeePhoto(employeeId, photoFile);
       }
 
       setShowModal(false);
@@ -274,6 +313,12 @@ export default function EmployeesPage() {
 
                 <div className="flex flex-wrap gap-2">
                   <button
+                    onClick={() => setIdCardEmployee(employee)}
+                    className="rounded-lg bg-sky-400/15 px-3 py-1.5 text-xs font-semibold text-sky-200 transition hover:bg-sky-400/25"
+                  >
+                    ID Card
+                  </button>
+                  <button
                     onClick={() => openEditModal(employee)}
                     className="rounded-lg bg-amber-300/20 px-3 py-1.5 text-xs text-amber-200 transition hover:bg-amber-300/30"
                   >
@@ -346,6 +391,17 @@ export default function EmployeesPage() {
             options={EMPLOYEE_STATUSES.map((status) => ({ value: status, label: status }))}
           />
 
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-300">Employee Photo</label>
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+              className="block w-full cursor-pointer rounded-lg border border-white/10 bg-black/20 p-2 text-xs text-gray-400 file:mr-3 file:rounded-md file:border-0 file:bg-amber-300/15 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-amber-200"
+            />
+            <p className="mt-1 text-xs text-gray-500">JPG, PNG, or WebP · maximum 5 MB.</p>
+          </div>
+
           <FormTextarea
             label="Notes"
             value={formData.notes || ""}
@@ -372,6 +428,12 @@ export default function EmployeesPage() {
           </div>
         </form>
       </Modal>
+
+      <EmployeeIdCardModal
+        employee={idCardEmployee}
+        onClose={() => setIdCardEmployee(null)}
+        onPhotoUpload={handleIdCardPhotoUpload}
+      />
     </div>
   );
 }

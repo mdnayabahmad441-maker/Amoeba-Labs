@@ -266,6 +266,7 @@ export interface Employee {
   status: EmployeeStatus;
   auth_user_id: string | null;
   is_founder: boolean;
+  photo_url?: string | null;
   archived_at?: string | null;
   notes: string | null;
   created_at: string;

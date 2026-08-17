@@ -418,3 +418,29 @@ body {
 .gold-rule {
   background: linear-gradient(90deg, transparent, rgba(244, 213, 138, 0.42), transparent);
 }
+
+@media print {
+  /* One physical sheet sized for the vertical employee ID card. */
+  @page { size: 110mm 145mm; margin: 0; }
+  html, body {
+    width: 110mm !important;
+    height: 145mm !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background: #fff !important;
+  }
+  body * { visibility: hidden !important; }
+  #employee-id-card, #employee-id-card * { visibility: visible !important; }
+  #employee-id-card {
+    position: absolute !important;
+    top: 12mm !important;
+    left: 12mm !important;
+    margin: 0 !important;
+    width: 86mm;
+    color: #f8f3e8 !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}
