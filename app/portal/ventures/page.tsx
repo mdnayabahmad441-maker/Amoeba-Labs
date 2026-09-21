@@ -15,6 +15,14 @@ interface CreateVentureInput {
   venture_kind: Venture["venture_kind"];
 }
 
+function ventureErrorMessage(err: unknown) {
+  const message = err instanceof Error ? err.message : "Unable to save business unit.";
+  if (/row-level security|permission denied|403/i.test(message)) {
+    return "Your portal account is missing founder access. Run VENTURE_RLS_RECOVERY.sql in the Supabase SQL Editor, then refresh this page.";
+  }
+  return message;
+}
+
 export default function VenturesPage() {
   const [ventures, setVentures] = useState<Venture[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +108,7 @@ export default function VenturesPage() {
       setShowModal(false);
       loadData();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Unable to save business unit.");
+      setError(ventureErrorMessage(err));
     } finally {
       setSubmitting(false);
     }

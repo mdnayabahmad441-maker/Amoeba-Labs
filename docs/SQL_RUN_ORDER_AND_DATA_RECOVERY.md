@@ -48,6 +48,10 @@ written to preserve existing rows.
 23. `PHASE_19_CALENDAR_VERIFICATION_UPGRADE.sql`
 24. `PHASE_20_FINAL_REPORTS_UPGRADE.sql`
 
+If saving a Business unit returns HTTP 403 / a row-level security error, run
+`VENTURE_RLS_RECOVERY.sql` once. It restores founder access for the configured
+portal owner emails while leaving RLS enabled.
+
 There are no separate Phase 6, 7, or 15 SQL files: those phases reused the
 Phase 3, Phase 5, Phase 8, and reporting schema. Do not run
 `PUBLIC_ENQUIRY_LEADS_POLICY.sql`; the current public enquiry API uses a

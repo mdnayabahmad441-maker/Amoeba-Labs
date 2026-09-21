@@ -47,22 +47,37 @@ export default function EmployeesPage() {
       setLoading(true);
       setError("");
 
-      const { data: ventures, error: ventureError } = await supabase
+      // The default business is the portal's current working venture. Prefer it
+      // before checking the status-based fallback so older venture records whose
+      // status was changed outside this screen do not block employee management.
+      const { data: defaultVentures, error: defaultVentureError } = await supabase
         .from("ventures")
         .select("id")
-        .eq("status", "Active")
+        .eq("is_default", true)
         .is("archived_at", null)
-        .order("is_default", { ascending: false })
         .order("created_at", { ascending: true })
         .limit(1);
 
-      if (ventureError) throw ventureError;
-      if (!ventures?.length) {
+      if (defaultVentureError) throw defaultVentureError;
+
+      const { data: activeVentures, error: activeVentureError } = defaultVentures?.length
+        ? { data: defaultVentures, error: null }
+        : await supabase
+          .from("ventures")
+          .select("id")
+          .eq("status", "Active")
+          .is("archived_at", null)
+          .order("is_default", { ascending: false })
+          .order("created_at", { ascending: true })
+          .limit(1);
+
+      if (activeVentureError) throw activeVentureError;
+      if (!activeVentures?.length) {
         setError("No active venture found.");
         return;
       }
 
-      const activeVentureId = ventures[0].id as string;
+      const activeVentureId = activeVentures[0].id as string;
       setVentureId(activeVentureId);
 
       let query = supabase

@@ -56,6 +56,12 @@ AS $$
     WHERE membership.user_id = auth.uid()
       AND membership.role = 'Founder'
       AND membership.status = 'Active'
+  )
+  -- Allows the configured portal owners to create the first venture, before a
+  -- membership exists for it. Keep this list aligned with auth-config.ts.
+  OR LOWER(COALESCE(auth.jwt() ->> 'email', '')) IN (
+    LOWER('groenics@gmail.com'),
+    LOWER('mdnayabahmad441@gmail.com')
   );
 $$;
 
