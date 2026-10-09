@@ -1,11 +1,19 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { isPortalAllowedEmail } from "@/lib/auth-config";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/portal/today";
+  const rawNext = searchParams.get("next");
+  const safeNext =
+    rawNext &&
+    rawNext.startsWith("/") &&
+    !rawNext.startsWith("//") &&
+    !rawNext.includes("\\")
+      ? rawNext
+      : "/portal/today";
 
   if (code) {
     const cookieStore = await cookies();
@@ -30,7 +38,16 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user || !isPortalAllowedEmail(user.email)) {
+        await supabase.auth.signOut();
+        return NextResponse.redirect(`${origin}/auth/login?error=unauthorized`);
+      }
+
+      return NextResponse.redirect(`${origin}${safeNext}`);
     }
   }
 

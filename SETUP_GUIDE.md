@@ -147,8 +147,8 @@ Update your `.env.local` file with these variables:
 
 ```env
 # Existing (already have)
-NEXT_PUBLIC_SUPABASE_URL=https://ynbnjapjrtrdjekokseo.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluYm5qYXBqcnRyZGpla29rc2VvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1Mjk3MTMsImV4cCI6MjA5NjEwNTcxM30.Y1FFAXRDiLgLmq8cqdh4HQLVUX5xjVhN0vKGKWXQdNk
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key-here
 
 # NEW - Add these (get from Supabase Settings → API)
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here

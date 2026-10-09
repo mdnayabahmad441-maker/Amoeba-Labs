@@ -42,6 +42,7 @@ export default async function Layout({
   }
 
   if (!isPortalAllowedEmail(user.email)) {
+    await supabase.auth.signOut();
     redirect("/auth/login?error=unauthorized");
   }
 

@@ -176,8 +176,9 @@ export async function POST(request: Request) {
     .maybeSingle();
 
   if (ventureError || !venture) {
+    if (ventureError) console.error("Enquiry venture lookup failed:", ventureError);
     return Response.json(
-      { error: ventureError?.message || "No active venture found for this enquiry." },
+      { error: "Unable to process enquiry at this time." },
       { status: 500 }
     );
   }
@@ -257,8 +258,9 @@ export async function POST(request: Request) {
     ? await supabase.from("leads").update(leadPayload).eq("id", existingLead.id).select("id").single()
     : await supabase.from("leads").insert([{ ...leadPayload, venture_id: venture.id, pipeline_stage: "New", lead_temperature: "Warm", first_enquiry_at: new Date().toISOString(), first_landing_page: clean(body.landingPage) }]).select("id").single();
   if (leadResult.error || !leadResult.data) {
+    if (leadResult.error) console.error("Enquiry lead save failed:", leadResult.error);
     return Response.json(
-      { error: leadResult.error?.message || "Unable to save enquiry." },
+      { error: "Unable to save enquiry at this time." },
       { status: 500 }
     );
   }
@@ -272,7 +274,8 @@ export async function POST(request: Request) {
     user_agent: request.headers.get("user-agent")?.slice(0, 500) || null,
   }]);
   if (historyError) {
-    return Response.json({ error: "Enquiry was matched, but its history could not be recorded." }, { status: 500 });
+    console.error("Enquiry history recording failed:", historyError);
+    return Response.json({ error: "Unable to complete enquiry recording at this time." }, { status: 500 });
   }
 
   const [activityResult, todayResult] = await Promise.all([

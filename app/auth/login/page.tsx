@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import { isPortalAllowedEmail } from "@/lib/auth-config";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 function LoginContent() {
@@ -36,9 +37,13 @@ function LoginContent() {
     let isMounted = true;
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
+      .then(async ({ data: { session } }) => {
         if (isMounted && session) {
-          router.replace("/portal/today");
+          if (isPortalAllowedEmail(session.user?.email)) {
+            router.replace("/portal/today");
+          } else {
+            await supabase.auth.signOut();
+          }
         }
       })
       .catch(() => {

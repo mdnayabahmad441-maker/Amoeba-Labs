@@ -52,7 +52,13 @@ const dateInRange = (value: string | null | undefined, from: string, to: string)
 function downloadCsv(name: string, rows: CsvRow[]) {
   if (!rows.length) return;
   const columns = [...new Set(rows.flatMap((row) => Object.keys(row)))];
-  const escape = (value: unknown) => `"${String(value ?? "").replaceAll('"', '""')}"`;
+  const escape = (value: unknown) => {
+    let str = String(value ?? "");
+    if (/^[=+\-@\t\r]/.test(str)) {
+      str = `'${str}`;
+    }
+    return `"${str.replaceAll('"', '""')}"`;
+  };
   const csv = [columns.map(escape).join(","), ...rows.map((row) => columns.map((column) => escape(row[column])).join(","))].join("\r\n");
   const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
   const anchor = document.createElement("a");
