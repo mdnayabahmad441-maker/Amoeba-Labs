@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { CreateEmployeeInput, Employee, EMPLOYEE_STATUSES } from "@/lib/types";
 import Modal from "@/components/Portal/Modal";
 import EmployeeIdCardModal from "@/components/Portal/EmployeeIdCardModal";
+import { cleanupOrphanedEmployeePhotos } from "@/lib/employee-photo.ts";
 import { FormInput, FormSelect, FormTextarea } from "@/components/Portal/FormInputs";
 import { EmptyState, LoadingState } from "@/components/Portal/States";
 
@@ -161,15 +162,18 @@ export default function EmployeesPage() {
       throw new Error("Use a JPG, PNG, or WebP photo up to 5 MB.");
     }
     const extension = file.name.split(".").pop()?.toLowerCase() || "jpg";
-    const photoPath = `${ventureId}/${employeeId}/photo.${extension}`;
+    const fileName = `photo.${extension}`;
+    const photoPath = `${ventureId}/${employeeId}/${fileName}`;
     const { error: uploadError } = await supabase.storage.from("employee-photos").upload(photoPath, file, { upsert: true, contentType: file.type });
     if (uploadError) throw uploadError;
-    const { data: publicUrl } = supabase.storage.from("employee-photos").getPublicUrl(photoPath);
-    // Supabase Storage keeps the same path on replacement; version the URL so browsers fetch the new image.
-    const versionedPhotoUrl = `${publicUrl.publicUrl}?v=${Date.now()}`;
-    const { error: photoUpdateError } = await supabase.from("employees").update({ photo_url: versionedPhotoUrl }).eq("id", employeeId);
+
+    // Safely remove prior photos with different extensions for this specific employee
+    await cleanupOrphanedEmployeePhotos(ventureId, employeeId, fileName);
+
+    // Persist the relative storage path in the database instead of a public or expiring signed URL
+    const { error: photoUpdateError } = await supabase.from("employees").update({ photo_url: photoPath }).eq("id", employeeId);
     if (photoUpdateError) throw photoUpdateError;
-    return versionedPhotoUrl;
+    return photoPath;
   }
 
   async function handleIdCardPhotoUpload(file: File) {

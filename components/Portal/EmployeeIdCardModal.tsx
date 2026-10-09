@@ -1,9 +1,10 @@
 "use client";
 /* eslint-disable @next/next/no-img-element -- Supabase Storage URL is user-uploaded and shown inside a printable card. */
 
-import { ChangeEvent, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Employee } from "@/lib/types";
+import { getEmployeePhotoSignedUrl } from "@/lib/employee-photo.ts";
 import Modal from "./Modal";
 
 interface EmployeeIdCardModalProps {
@@ -29,6 +30,28 @@ function initials(name: string) {
 export default function EmployeeIdCardModal({ employee, onClose, onPhotoUpload }: EmployeeIdCardModalProps) {
   const photoInput = useRef<HTMLInputElement>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [signedPhotoUrl, setSignedPhotoUrl] = useState<string | null>(null);
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const photoUrl = employee?.photo_url;
+    if (!photoUrl) return;
+
+    getEmployeePhotoSignedUrl(photoUrl).then((url) => {
+      if (isMounted) {
+        setSignedPhotoUrl(url);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [employee?.photo_url]);
+
+  const activePhotoUrl = employee?.photo_url ? signedPhotoUrl : null;
+  const isImageFailed = Boolean(activePhotoUrl && failedUrl === activePhotoUrl);
+
   if (!employee) return null;
 
   async function uploadPhoto(event: ChangeEvent<HTMLInputElement>) {
@@ -65,7 +88,18 @@ export default function EmployeeIdCardModal({ employee, onClose, onPhotoUpload }
             <div className="relative mt-5 flex gap-4">
               <input ref={photoInput} type="file" accept="image/jpeg,image/png,image/webp" onChange={uploadPhoto} className="hidden" />
               <button type="button" onClick={() => photoInput.current?.click()} disabled={uploadingPhoto} title="Upload employee photo" className="group relative h-24 w-20 shrink-0 overflow-hidden rounded-2xl border border-amber-200/30 disabled:opacity-60">
-                {employee.photo_url ? <img src={employee.photo_url} alt={employee.full_name} className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-300 to-amber-600 text-2xl font-black text-[#071426]">{initials(employee.full_name)}</span>}
+                {activePhotoUrl && !isImageFailed ? (
+                  <img
+                    src={activePhotoUrl}
+                    alt={employee.full_name}
+                    onError={() => setFailedUrl(activePhotoUrl)}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-full w-full items-center justify-center bg-gradient-to-br from-amber-300 to-amber-600 text-2xl font-black text-[#071426]">
+                    {initials(employee.full_name)}
+                  </span>
+                )}
                 <span className="absolute inset-0 flex items-center justify-center bg-black/65 px-1 text-center text-[9px] font-bold uppercase tracking-wide text-white opacity-0 transition group-hover:opacity-100">{uploadingPhoto ? "Uploading" : "Change photo"}</span>
               </button>
               <div className="min-w-0">
